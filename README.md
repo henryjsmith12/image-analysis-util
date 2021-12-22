@@ -4,6 +4,8 @@ Copyright (c) UChicago Argonne, LLC. All rights reserved.
 
 Scientific image exploration software for 3D and 4D datasets. A continuation of the Image_Analysis repository.
 
+## About
+
 ### Built With
 
 * [`PyQt5`](https://pypi.org/project/PyQt5/)
@@ -34,3 +36,18 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
    ```
    conda activate ia-util-venv
    ```
+
+## Usage
+
+## Roadmap
+
+## License
+
+## Author
+
+[Henry Smith](https://www.linkedin.com/in/henry-smith-5956a0189/) - Co-op Student Technical at Argonne National Laboratory
+
+## Support
+
+* [Report bugs here](https://github.com/henryjsmith12/image-analysis-util/issues)
+* Author email: [smithh@anl.gov](smithh@anl.gov)
