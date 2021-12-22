@@ -41,8 +41,6 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 
 ## Roadmap
 
-## License
-
 ## Author
 
 [Henry Smith](https://www.linkedin.com/in/henry-smith-5956a0189/) - Co-op Student Technical at Argonne National Laboratory
