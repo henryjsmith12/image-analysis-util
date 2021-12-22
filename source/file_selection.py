@@ -23,7 +23,10 @@ class FileSelectionWidget(QtGui.QWidget):
     def __init__(self):
         super(FileSelectionWidget, self).__init__()
 
-        # Subwidget creation
+        # Class variables
+        self.file_path = ""
+
+        # Subwidgets
         self.prompt_lbl = QtGui.QLabel("Select or create an .iau file to begin.")
         self.prompt_lbl.setAlignment(QtCore.Qt.AlignCenter)
         self.select_file_txt = QtGui.QLineEdit()
@@ -37,13 +40,11 @@ class FileSelectionWidget(QtGui.QWidget):
         # Layout
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
-
         self.layout.addWidget(self.prompt_lbl, 0, 0, 1, 4)
         self.layout.addWidget(self.select_file_txt, 1, 0, 1, 2)
         self.layout.addWidget(self.select_file_btn, 1, 2, 1, 2)
         self.layout.addWidget(self.create_file_btn, 2, 0, 1, 2)
         self.layout.addWidget(self.load_file_btn, 2, 2, 1, 2)
-
         self.layout.setColumnStretch(0, 1)
         self.layout.setColumnStretch(1, 1)
         self.layout.setColumnStretch(2, 1)
@@ -57,7 +58,17 @@ class FileSelectionWidget(QtGui.QWidget):
     # --------------------------------------------------------------------------
 
     def SelectFile(self):
-        ...
+        """
+        Gets file path and displays path in textbox.
+        """
+
+        self.file_path = QtGui.QFileDialog.getOpenFileName(self, "Select File", "", "(*.iau)")
+        self.select_file_txt.setText(self.file_path)
+
+        if self.file_path != "":
+            self.load_file_btn.setEnabled(True)
+        else:
+            self.load_file_btn.setEnabled(False)
 
     # --------------------------------------------------------------------------
 
