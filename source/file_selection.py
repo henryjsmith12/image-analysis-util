@@ -10,7 +10,7 @@ from pyqtgraph import QtGui, QtCore
 
 # ==============================================================================
 
-class FileSelectionWidget(QtGui.QWidget):
+class FileSelectionWidget(QtGui.QDialog):
 
     """ 
     A dialog that allows the user to select or create, and then load a file.
@@ -74,7 +74,12 @@ class FileSelectionWidget(QtGui.QWidget):
     # --------------------------------------------------------------------------
 
     def CreateFile(self):
-        ...
+        """
+        Opens a file creation dialog.
+        """
+
+        cfd = FileCreationWidget()
+        cfd.exec_()
 
     # --------------------------------------------------------------------------
 
@@ -83,5 +88,23 @@ class FileSelectionWidget(QtGui.QWidget):
 
 # ==============================================================================
 
-class FileCreationWidget(QtGui.QWidget):
-    ...
+class FileCreationWidget(QtGui.QDialog):
+    """
+    A dialog that allows the user to create an .iau file from a data source.
+    """
+    
+    def __init__(self):
+        super(FileCreationWidget, self).__init__()
+
+        # Subwidgets
+        self.select_data_source_txt = QtGui.QLineEdit()
+        self.select_data_source_txt.setReadOnly(True)
+        self.select_data_source_btn = QtGui.QPushButton("Select Data Source")
+        self.select_data_source_btn.setDefault(True)
+
+        # Layout
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(self.select_data_source_txt, 0, 0, 1, 2)
+        self.layout.addWidget(self.select_data_source_btn, 0, 2, 1, 2)
