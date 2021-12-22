@@ -41,6 +41,14 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 
 ## Roadmap
 
+* [X] .iau file selector
+* [ ] .iau file creator
+* [ ] Basic analysis window
+
+## License
+
+See [`LICENSE.txt`](https://github.com/henryjsmith12/image-analysis-util/blob/main/LICENSE) for more information.
+
 ## Author
 
 [Henry Smith](https://www.linkedin.com/in/henry-smith-5956a0189/) - Co-op Student Technical at Argonne National Laboratory
@@ -48,4 +56,4 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 ## Support
 
 * [Report bugs here](https://github.com/henryjsmith12/image-analysis-util/issues)
-* Author email: [smithh@anl.gov](smithh@anl.gov)
+* Email author at [smithh@anl.gov](smithh@anl.gov)
