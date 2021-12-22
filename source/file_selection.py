@@ -49,6 +49,26 @@ class FileSelectionWidget(QtGui.QWidget):
         self.layout.setColumnStretch(2, 1)
         self.layout.setColumnStretch(3, 1)
 
+        # Connections
+        self.select_file_btn.clicked.connect(self.SelectFile)
+        self.create_file_btn.clicked.connect(self.CreateFile)
+        self.load_file_btn.clicked.connect(self.LoadFile)
+
+    # --------------------------------------------------------------------------
+
+    def SelectFile(self):
+        ...
+
+    # --------------------------------------------------------------------------
+
+    def CreateFile(self):
+        ...
+
+    # --------------------------------------------------------------------------
+
+    def LoadFile(self):
+        ...
+
 # ==============================================================================
 
 class FileCreationWidget(QtGui.QWidget):
