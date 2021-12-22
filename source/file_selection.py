@@ -62,9 +62,10 @@ class FileSelectionWidget(QtGui.QWidget):
         Gets file path and displays path in textbox.
         """
 
-        self.file_path = QtGui.QFileDialog.getOpenFileName(self, "Select File", "", "(*.iau)")
+        self.file_path = QtGui.QFileDialog.getOpenFileName(self, "Select File", "", "(*.iau)")[0]
         self.select_file_txt.setText(self.file_path)
 
+        # Enables "Load File" button if file path is valid
         if self.file_path != "":
             self.load_file_btn.setEnabled(True)
         else:
