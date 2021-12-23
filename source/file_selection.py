@@ -11,7 +11,7 @@ import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtGui, QtCore
 import vtk
-from vtk.util import numpy_support as npSup
+from vtk.util import numpy_support as npSup # type: ignore
 
 # ==============================================================================
 
@@ -103,11 +103,10 @@ class FileCreationWidget(QtGui.QDialog):
 
         # Class variables
         self.data_source_file_path = ""
-        self.dim_labels = "H, K, L"
+        self.new_file_dim_labels = "H, K, L"
         self.new_file_path = ""
         self.new_file_data = None
         self.new_file_axes = None
-        self.new_file_dim_labels = None
         self.new_file_metadata = None
 
         # Window attributes
@@ -121,9 +120,9 @@ class FileCreationWidget(QtGui.QDialog):
         self.data_source_txt = QtGui.QLineEdit()
         self.data_source_txt.setReadOnly(True)
         self.data_source_btn = QtGui.QPushButton("Browse")
-        self.dim_labels_lbl = QtGui.QLabel("Dimension Labels: ")
-        self.dim_labels_txt = QtGui.QLineEdit()
-        self.dim_labels_txt.setText(self.dim_labels)
+        self.new_file_dim_labels_lbl = QtGui.QLabel("Dimension Labels: ")
+        self.new_file_dim_labels_txt = QtGui.QLineEdit()
+        self.new_file_dim_labels_txt.setText(self.new_file_dim_labels)
         self.create_file_btn = QtGui.QPushButton("Save and Create File")
         self.create_file_btn.setDefault(True)
         self.create_file_btn.setEnabled(False)
@@ -136,8 +135,8 @@ class FileCreationWidget(QtGui.QDialog):
         self.layout.addWidget(self.data_source_lbl, 1, 0, 1, 2)
         self.layout.addWidget(self.data_source_txt, 1, 2, 1, 2)
         self.layout.addWidget(self.data_source_btn, 1, 4, 1, 2)
-        self.layout.addWidget(self.dim_labels_lbl, 2, 0, 1, 2)
-        self.layout.addWidget(self.dim_labels_txt, 2, 2, 1, 4)
+        self.layout.addWidget(self.new_file_dim_labels_lbl, 2, 0, 1, 2)
+        self.layout.addWidget(self.new_file_dim_labels_txt, 2, 2, 1, 4)
         self.layout.addWidget(self.create_file_btn, 3, 4, 1, 2)
 
         # Connections
@@ -166,12 +165,13 @@ class FileCreationWidget(QtGui.QDialog):
 
     def accept(self):
         """
-        
+        Calls functions to save and create new file.
         """
 
         self.selectNewFileLocation()
         self.loadDataSource()
         self.createNewFile()
+        self.close()
         
     # --------------------------------------------------------------------------
     
@@ -186,7 +186,7 @@ class FileCreationWidget(QtGui.QDialog):
 
     def loadDataSource(self):
         """
-        
+        Loads data and axes from data source.
         """
 
         # .vti
@@ -196,8 +196,22 @@ class FileCreationWidget(QtGui.QDialog):
     # --------------------------------------------------------------------------
 
     def createNewFile(self):
-        ...
-        
+        """
+        Creates .iau file with data, axes, and labels.
+        """
+
+        # Utilizes HDF5 file formatting
+        new_file = h5py.File(self.new_file_path, 'a')
+        new_file.create_dataset("data", data=self.new_file_data)
+        new_file.create_group("coords")
+
+        # Adds scale for each axis
+        for i in range(len(self.new_file_axes)):
+            axis = np.array(self.new_file_axes[i])
+            new_file.create_dataset(f"coords/axis_{i}", data=axis)
+            new_file["data"].dims[i].label = self.new_file_dim_labels[i]
+            new_file[f"coords/axis_{i}"].make_scale(self.new_file_dim_labels[i])
+            new_file["data"].dims[i].attach_scale(new_file[f"coords/axis_{i}"])
 
 # ==============================================================================
 
@@ -238,8 +252,5 @@ class DataSource:
 
         # A list of lists of varying lengths
         axes = [axis_0, axis_1, axis_2]
-
-        print(data.shape)
-        print(axes)
 
         return data, axes
