@@ -85,6 +85,15 @@ class FileSelectionWidget(QtGui.QDialog):
 
         cfd = FileCreationWidget()
         cfd.exec_()
+        
+        self.file_path = cfd.new_file_path
+        self.select_file_txt.setText(self.file_path)
+
+        # Enables "Load File" button if file path is valid
+        if self.file_path != "":
+            self.load_file_btn.setEnabled(True)
+        else:
+            self.load_file_btn.setEnabled(False)
 
     # --------------------------------------------------------------------------
 
