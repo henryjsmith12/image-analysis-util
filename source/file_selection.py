@@ -5,8 +5,13 @@ See LICENSE file.
 
 # ==============================================================================
 
+import h5py
+import os
+import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtGui, QtCore
+import vtk
+from vtk.util import numpy_support as npSup
 
 # ==============================================================================
 
@@ -97,9 +102,13 @@ class FileCreationWidget(QtGui.QDialog):
         super(FileCreationWidget, self).__init__()
 
         # Class variables
-        self.new_file_path = ""
         self.data_source_file_path = ""
         self.dim_labels = "H, K, L"
+        self.new_file_path = ""
+        self.new_file_data = None
+        self.new_file_axes = None
+        self.new_file_dim_labels = None
+        self.new_file_metadata = None
 
         # Window attributes
         self.setWindowTitle("New File")
@@ -162,6 +171,7 @@ class FileCreationWidget(QtGui.QDialog):
 
         self.selectNewFileLocation()
         self.loadDataSource()
+        self.createNewFile()
         
     # --------------------------------------------------------------------------
     
@@ -179,10 +189,57 @@ class FileCreationWidget(QtGui.QDialog):
         
         """
 
+        # .vti
         if self.data_source_file_path.endswith(".vti"):
-            ...
+            self.new_file_data, self.new_file_axes = DataSource.loadVTIDataSource(self.data_source_file_path)
 
     # --------------------------------------------------------------------------
 
     def createNewFile(self):
         ...
+        
+
+# ==============================================================================
+
+class DataSource:
+    """
+    Functions for loading data from particular data sources.
+    """
+    
+    def loadVTIDataSource(file_path):
+        """
+        Reads data and axes from 
+        """
+
+        # Reads the VTK XML ImageData file format
+        data_reader = vtk.vtkXMLImageDataReader()
+        data_reader.SetFileName(file_path)
+        data_reader.Update()
+
+        raw_data = data_reader.GetOutput()
+        dimensions = list(raw_data.GetDimensions())
+        
+        data = npSup.vtk_to_numpy(raw_data.GetPointData().GetArray('Scalars_'))
+        data = data.reshape(dimensions)
+        
+        origin = raw_data.GetOrigin() # First point for each axis
+        spacing = raw_data.GetSpacing() # Space between points for each axis
+        extent = raw_data.GetExtent() # First and last index of each axis
+
+        axis_0, axis_1, axis_2 = [], [], []
+
+        # Adds values to each axis accordingly
+        for point in range(extent[0], extent[1] + 1):
+            axis_0.append(origin[0] + point * spacing[0])
+        for point in range(extent[2], extent[3] + 1):
+            axis_1.append(origin[1] + point * spacing[1])
+        for point in range(extent[4], extent[5] + 1):
+            axis_2.append(origin[2] + point * spacing[2])
+
+        # A list of lists of varying lengths
+        axes = [axis_0, axis_1, axis_2]
+
+        print(data.shape)
+        print(axes)
+
+        return data, axes
