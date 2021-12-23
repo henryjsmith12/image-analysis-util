@@ -67,14 +67,17 @@ class FileSelectionWidget(QtGui.QDialog):
         Gets file path and displays path in textbox.
         """
 
-        self.file_path = QtGui.QFileDialog.getOpenFileName(self, "Select File", "", "(*.iau)")[0]
-        self.select_file_txt.setText(self.file_path)
+        try:
+            self.file_path = QtGui.QFileDialog.getOpenFileName(self, "Select File", "", "(*.iau)")[0]
+            self.select_file_txt.setText(self.file_path)
 
-        # Enables "Load File" button if file path is valid
-        if self.file_path != "":
-            self.load_file_btn.setEnabled(True)
-        else:
-            self.load_file_btn.setEnabled(False)
+            # Enables "Load File" button if file path is valid
+            if self.file_path != "":
+                self.load_file_btn.setEnabled(True)
+            else:
+                self.load_file_btn.setEnabled(False)
+        except Exception as ex:
+            QtGui.QMessageBox(self, "Error", ex)
 
     # --------------------------------------------------------------------------
 
@@ -85,7 +88,7 @@ class FileSelectionWidget(QtGui.QDialog):
 
         cfd = FileCreationWidget()
         cfd.exec_()
-        
+
         self.file_path = cfd.new_file_path
         self.select_file_txt.setText(self.file_path)
 
@@ -98,7 +101,9 @@ class FileSelectionWidget(QtGui.QDialog):
     # --------------------------------------------------------------------------
 
     def loadFile(self):
-        ...
+        """
+        Loads new analysis window for file.
+        """     
 
 # ==============================================================================
 
@@ -159,16 +164,19 @@ class FileCreationWidget(QtGui.QDialog):
         Gets data source file path and displays path in textbox.
         """
 
-        self.data_source_file_path = QtGui.QFileDialog.getOpenFileName(self, "Open File", \
-            "", f"(*{self.source_type_cbx.currentText()})")[0]
+        try:
+            self.data_source_file_path = QtGui.QFileDialog.getOpenFileName(self, "Open File", \
+                "", f"(*{self.source_type_cbx.currentText()})")[0]
 
-        self.data_source_txt.setText(self.data_source_file_path)
+            self.data_source_txt.setText(self.data_source_file_path)
 
-        # Enables "Load File" button if data source is valid
-        if self.data_source_file_path != "":
-            self.create_file_btn.setEnabled(True)
-        else:
-            self.create_file_btn.setEnabled(False)
+            # Enables "Load File" button if data source is valid
+            if self.data_source_file_path != "":
+                self.create_file_btn.setEnabled(True)
+            else:
+                self.create_file_btn.setEnabled(False)
+        except Exception as ex:
+            QtGui.QMessageBox(self, "Error", ex)
 
     # --------------------------------------------------------------------------
 
@@ -189,7 +197,10 @@ class FileCreationWidget(QtGui.QDialog):
         Gets file path for new file.
         """
 
-        self.new_file_path = QtGui.QFileDialog.getSaveFileName(self, "Save As", "", "*.iau")[0]
+        try:
+            self.new_file_path = QtGui.QFileDialog.getSaveFileName(self, "Save As", "", "*.iau")[0]
+        except Exception as ex:
+            QtGui.QMessageBox(self, "Error", ex)
 
     # --------------------------------------------------------------------------
 
@@ -198,9 +209,12 @@ class FileCreationWidget(QtGui.QDialog):
         Loads data and axes from data source.
         """
 
-        # .vti
-        if self.data_source_file_path.endswith(".vti"):
-            self.new_file_data, self.new_file_axes = DataSource.loadVTIDataSource(self.data_source_file_path)
+        try:
+            # .vti
+            if self.data_source_file_path.endswith(".vti"):
+                self.new_file_data, self.new_file_axes = DataSource.loadVTIDataSource(self.data_source_file_path)
+        except Exception as ex:
+            QtGui.QMessageBox(self, "Error", ex)
 
     # --------------------------------------------------------------------------
 
@@ -209,18 +223,21 @@ class FileCreationWidget(QtGui.QDialog):
         Creates .iau file with data, axes, and labels.
         """
 
-        # Utilizes HDF5 file formatting
-        new_file = h5py.File(self.new_file_path, 'a')
-        new_file.create_dataset("data", data=self.new_file_data)
-        new_file.create_group("coords")
+        try:
+            # Utilizes HDF5 file formatting
+            new_file = h5py.File(self.new_file_path, 'a')
+            new_file.create_dataset("data", data=self.new_file_data)
+            new_file.create_group("coords")
 
-        # Adds scale for each axis
-        for i in range(len(self.new_file_axes)):
-            axis = np.array(self.new_file_axes[i])
-            new_file.create_dataset(f"coords/axis_{i}", data=axis)
-            new_file["data"].dims[i].label = self.new_file_dim_labels[i]
-            new_file[f"coords/axis_{i}"].make_scale(self.new_file_dim_labels[i])
-            new_file["data"].dims[i].attach_scale(new_file[f"coords/axis_{i}"])
+            # Adds scale for each axis
+            for i in range(len(self.new_file_axes)):
+                axis = np.array(self.new_file_axes[i])
+                new_file.create_dataset(f"coords/axis_{i}", data=axis)
+                new_file["data"].dims[i].label = self.new_file_dim_labels[i]
+                new_file[f"coords/axis_{i}"].make_scale(self.new_file_dim_labels[i])
+                new_file["data"].dims[i].attach_scale(new_file[f"coords/axis_{i}"])
+        except Exception as ex:
+            QtGui.QMessageBox(self, "Error", ex)
 
 # ==============================================================================
 
