@@ -36,13 +36,18 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
    ```
    conda activate ia-util-venv
    ```
+4. Run program
+
+   ```
+   python image-analysis-util.py
+   ```
 
 ## Usage
 
 ## Roadmap
 
 * [X] .iau file selector
-* [ ] .iau file creator
+* [X] .iau file creator
 * [ ] Basic analysis window
 
 ## License
