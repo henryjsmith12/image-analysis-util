@@ -51,13 +51,13 @@ class FileSelectionWidget(QtGui.QDialog):
         self.layout.setColumnStretch(3, 1)
 
         # Connections
-        self.select_file_btn.clicked.connect(self.SelectFile)
-        self.create_file_btn.clicked.connect(self.CreateFile)
-        self.load_file_btn.clicked.connect(self.LoadFile)
+        self.select_file_btn.clicked.connect(self.selectFile)
+        self.create_file_btn.clicked.connect(self.createFile)
+        self.load_file_btn.clicked.connect(self.loadFile)
 
     # --------------------------------------------------------------------------
 
-    def SelectFile(self):
+    def selectFile(self):
         """
         Gets file path and displays path in textbox.
         """
@@ -73,7 +73,7 @@ class FileSelectionWidget(QtGui.QDialog):
 
     # --------------------------------------------------------------------------
 
-    def CreateFile(self):
+    def createFile(self):
         """
         Opens a file creation dialog.
         """
@@ -83,7 +83,7 @@ class FileSelectionWidget(QtGui.QDialog):
 
     # --------------------------------------------------------------------------
 
-    def LoadFile(self):
+    def loadFile(self):
         ...
 
 # ==============================================================================
@@ -97,7 +97,7 @@ class FileCreationWidget(QtGui.QDialog):
         super(FileCreationWidget, self).__init__()
 
         # Class variables
-        self.file_path = ""
+        self.new_file_path = ""
         self.data_source_file_path = ""
         self.dim_labels = "H, K, L"
 
@@ -115,12 +115,7 @@ class FileCreationWidget(QtGui.QDialog):
         self.dim_labels_lbl = QtGui.QLabel("Dimension Labels: ")
         self.dim_labels_txt = QtGui.QLineEdit()
         self.dim_labels_txt.setText(self.dim_labels)
-        self.save_as_lbl = QtGui.QLabel("Save File As: ")
-        self.save_as_txt = QtGui.QLineEdit()
-        self.save_as_txt.setReadOnly(True)
-        self.save_as_btn = QtGui.QPushButton("Browse")
-        self.cancel_btn = QtGui.QPushButton("Cancel")
-        self.create_file_btn = QtGui.QPushButton("Create File")
+        self.create_file_btn = QtGui.QPushButton("Save and Create File")
         self.create_file_btn.setDefault(True)
         self.create_file_btn.setEnabled(False)
 
@@ -134,24 +129,60 @@ class FileCreationWidget(QtGui.QDialog):
         self.layout.addWidget(self.data_source_btn, 1, 4, 1, 2)
         self.layout.addWidget(self.dim_labels_lbl, 2, 0, 1, 2)
         self.layout.addWidget(self.dim_labels_txt, 2, 2, 1, 4)
-        self.layout.addWidget(self.save_as_lbl, 3, 0, 1, 2)
-        self.layout.addWidget(self.save_as_txt, 3, 2, 1, 2)
-        self.layout.addWidget(self.save_as_btn, 3, 4, 1, 2)
-        self.layout.addWidget(self.cancel_btn, 4, 0, 1, 2)
-        self.layout.addWidget(self.create_file_btn, 4, 4, 1, 2)
+        self.layout.addWidget(self.create_file_btn, 3, 4, 1, 2)
 
         # Connections
-        self.data_source_btn.clicked.connect(self.SelectDataSource)
+        self.data_source_btn.clicked.connect(self.selectDataSource)
+        self.create_file_btn.clicked.connect(self.accept)
     
     # --------------------------------------------------------------------------
 
-    def SelectDataSource(self):
+    def selectDataSource(self):
         """
         Gets data source file path and displays path in textbox.
         """
 
-        self.data_source_file_path = QtGui.QFileDialog.getOpenFileName(self, \
-            "Select Data Source", "", f"(*{self.source_type_cbx.currentText})")[0]
+        self.data_source_file_path = QtGui.QFileDialog.getOpenFileName(self, "Open File", \
+            "", f"(*{self.source_type_cbx.currentText()})")[0]
+
         self.data_source_txt.setText(self.data_source_file_path)
 
+        # Enables "Load File" button if data source is valid
+        if self.data_source_file_path != "":
+            self.create_file_btn.setEnabled(True)
+        else:
+            self.create_file_btn.setEnabled(False)
+
     # --------------------------------------------------------------------------
+
+    def accept(self):
+        """
+        
+        """
+
+        self.selectNewFileLocation()
+        self.loadDataSource()
+        
+    # --------------------------------------------------------------------------
+    
+    def selectNewFileLocation(self):
+        """
+        Gets file path for new file.
+        """
+
+        self.new_file_path = QtGui.QFileDialog.getSaveFileName(self, "Save As", "", "*.iau")[0]
+
+    # --------------------------------------------------------------------------
+
+    def loadDataSource(self):
+        """
+        
+        """
+
+        if self.data_source_file_path.endswith(".vti"):
+            ...
+
+    # --------------------------------------------------------------------------
+
+    def createNewFile(self):
+        ...
