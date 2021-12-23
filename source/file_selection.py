@@ -37,10 +37,10 @@ class FileSelectionWidget(QtGui.QDialog):
         self.select_file_txt = QtGui.QLineEdit()
         self.select_file_txt.setReadOnly(True)
         self.select_file_btn = QtGui.QPushButton("Select File")
-        self.select_file_btn.setDefault(True)
         self.create_file_btn = QtGui.QPushButton("Create File")
         self.load_file_btn = QtGui.QPushButton("Load File")
         self.load_file_btn.setEnabled(False)
+        self.load_file_btn.setDefault(True)
 
         # Layout
         self.layout = QtGui.QGridLayout()
@@ -147,8 +147,8 @@ class FileCreationWidget(QtGui.QDialog):
         self.layout.addWidget(self.source_type_lbl, 0, 0, 1, 2)
         self.layout.addWidget(self.source_type_cbx, 0, 2, 1, 4)
         self.layout.addWidget(self.data_source_lbl, 1, 0, 1, 2)
-        self.layout.addWidget(self.data_source_txt, 1, 2, 1, 2)
-        self.layout.addWidget(self.data_source_btn, 1, 4, 1, 2)
+        self.layout.addWidget(self.data_source_txt, 1, 2, 1, 3)
+        self.layout.addWidget(self.data_source_btn, 1, 5, 1, 1)
         self.layout.addWidget(self.new_file_dim_labels_lbl, 2, 0, 1, 2)
         self.layout.addWidget(self.new_file_dim_labels_txt, 2, 2, 1, 4)
         self.layout.addWidget(self.create_file_btn, 3, 4, 1, 2)
