@@ -227,15 +227,15 @@ class FileCreationWidget(QtGui.QDialog):
             # Utilizes HDF5 file formatting
             new_file = h5py.File(self.new_file_path, 'a')
             new_file.create_dataset("data", data=self.new_file_data)
-            new_file.create_group("coords")
+            new_file.create_group("axes")
 
             # Adds scale for each axis
             for i in range(len(self.new_file_axes)):
                 axis = np.array(self.new_file_axes[i])
-                new_file.create_dataset(f"coords/axis_{i}", data=axis)
+                new_file.create_dataset(f"axes/axis_{i}", data=axis)
                 new_file["data"].dims[i].label = self.new_file_dim_labels[i]
-                new_file[f"coords/axis_{i}"].make_scale(self.new_file_dim_labels[i])
-                new_file["data"].dims[i].attach_scale(new_file[f"coords/axis_{i}"])
+                new_file[f"axes/axis_{i}"].make_scale(self.new_file_dim_labels[i])
+                new_file["data"].dims[i].attach_scale(new_file[f"axes/axis_{i}"])
         except Exception as ex:
             QtGui.QMessageBox(self, "Error", ex)
 
