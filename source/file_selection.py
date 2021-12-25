@@ -248,7 +248,7 @@ class DataSource:
     
     def loadVTIDataSource(file_path):
         """
-        Reads data and axes from 
+        Reads data and axes from .vti file.
         """
 
         # Reads the VTK XML ImageData file format
