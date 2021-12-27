@@ -104,7 +104,7 @@ class FileSelectionWidget(QtGui.QDialog):
 
     def loadFile(self):
         """
-        Loads new analysis window for file.
+        Loads new analysis window for file, closes this window.
         """     
 
         self.window = MainWindow(self.file_path)
