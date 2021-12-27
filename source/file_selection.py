@@ -13,6 +13,8 @@ from pyqtgraph import QtGui, QtCore
 import vtk
 from vtk.util import numpy_support as npSup # type: ignore
 
+from source.main_window import MainWindow
+
 # ==============================================================================
 
 class FileSelectionWidget(QtGui.QDialog):
@@ -104,6 +106,10 @@ class FileSelectionWidget(QtGui.QDialog):
         """
         Loads new analysis window for file.
         """     
+
+        self.window = MainWindow(self.file_path)
+        self.window.show()
+        self.close()
 
 # ==============================================================================
 
