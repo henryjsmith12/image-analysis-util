@@ -13,12 +13,11 @@ from pyqtgraph import QtGui, QtCore
 
 from source.image_widget import ImageWidget
 
-
 # ==============================================================================
 
 class MainWindow(QtGui.QWidget):
     """
-    
+    Creates/places widgets for analysis window
     """
 
     def __init__(self, file_path) -> None:
