@@ -15,9 +15,12 @@ from pyqtgraph import QtGui, QtCore
 
 class ImageController(QtGui.QWidget):
     """
-    Controllers image options, colormap.
+    Controls image, slicing direction.
     """
 
     def __init__(self, parent) -> None:
         super(ImageController, self).__init__(parent)
         self.main_window = parent
+
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
