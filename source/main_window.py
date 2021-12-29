@@ -27,6 +27,8 @@ class MainWindow(QtGui.QWidget):
     def __init__(self, file_path) -> None:
         super().__init__()
 
+        self.resize(1200, 800)
+
         # Class Variables 
         self.file_path = file_path
 
