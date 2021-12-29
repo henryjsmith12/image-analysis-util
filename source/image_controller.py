@@ -15,7 +15,7 @@ from pyqtgraph import QtGui, QtCore
 
 class ImageController(QtGui.QWidget):
     """
-    Controls image, slicing direction.
+    Controls the orthogonal slice in view and slicing direction.
     """
 
     def __init__(self, parent) -> None:
