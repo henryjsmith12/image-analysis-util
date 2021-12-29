@@ -15,7 +15,7 @@ from pyqtgraph import QtGui, QtCore
 
 class ImagePlot(pg.ImageView):
     """
-    Displays image.
+    A custom pyqtgraph ImageView that plots orthogonal slices from the dataset.
     """
 
     def __init__(self, parent=None, view=None) -> None:
@@ -25,7 +25,7 @@ class ImagePlot(pg.ImageView):
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
-    
+
     # --------------------------------------------------------------------------
 
     def plot(self):
