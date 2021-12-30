@@ -123,7 +123,7 @@ class FileCreationWidget(QtGui.QDialog):
 
         # Class variables
         self.data_source_file_path = ""
-        self.new_file_dim_labels = "H, K, L"
+        self.new_file_dim_labels = "H,K,L"
         self.new_file_path = ""
         self.new_file_data = None
         self.new_file_axes = None
@@ -234,6 +234,8 @@ class FileCreationWidget(QtGui.QDialog):
             new_file = h5py.File(self.new_file_path, 'a')
             new_file.create_dataset("data", data=self.new_file_data)
             new_file.create_group("axes")
+
+            self.new_file_dim_labels = self.new_file_dim_labels_txt.text().split(",")
 
             # Adds scale for each axis
             for i in range(len(self.new_file_axes)):
