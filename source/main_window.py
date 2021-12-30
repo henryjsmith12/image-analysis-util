@@ -31,7 +31,10 @@ class MainWindow(QtGui.QWidget):
 
         # Class Variables 
         self.file_path = file_path
-
+        self.data = None
+        self.axes = None
+        self.axis_labels = None
+        
         # Subwidgets
         self.dock_area = DockArea()
 
@@ -40,9 +43,22 @@ class MainWindow(QtGui.QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area)
 
+        self.readFile()
         self.createWidgets()
         self.createWidgetDocks()
 
+    # --------------------------------------------------------------------------
+
+    def readFile(self):
+        """
+        Reads information from .iau file.
+        """
+
+        with h5py.File(self.file_path, 'r') as file:
+            self.data = file["data"][...]
+            self.axes = [dim[0][...].tolist() for dim in file["data"].dims]
+            self.axis_labels = [dim.label for dim in file["data"].dims]
+            
     # --------------------------------------------------------------------------
 
     def createWidgets(self):
