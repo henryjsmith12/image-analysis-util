@@ -6,8 +6,9 @@ See LICENSE file.
 # ==============================================================================
 
 import h5py
-import os
+from matplotlib import colors
 import numpy as np
+import os
 import pyqtgraph as pg
 from pyqtgraph import QtGui, QtCore
 
@@ -22,7 +23,7 @@ class ImagePlot(pg.ImageView):
         super(ImagePlot, self).__init__(parent, view=pg.PlotItem())
         self.main_window = parent
 
-        self.ui.histogram.hide()
+        #self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
 
