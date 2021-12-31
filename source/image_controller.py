@@ -29,7 +29,7 @@ class ImageController(QtGui.QWidget):
         self.slider2 = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.slider2_lbl = QtGui.QLabel()
         self.slider2_cbx = QtGui.QComboBox()
-        
+
         # Layout
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
@@ -39,3 +39,5 @@ class ImageController(QtGui.QWidget):
         self.layout.addWidget(self.slider2_lbl, 1, 0)
         self.layout.addWidget(self.slider2, 1, 1, 1, 6)
         self.layout.addWidget(self.slider2_cbx, 1, 7)
+
+        # Connections
