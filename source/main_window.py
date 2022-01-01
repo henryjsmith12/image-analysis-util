@@ -29,7 +29,6 @@ class MainWindow(QtGui.QWidget):
 
         self.resize(1200, 800)
 
-        # Instance Variables 
         self.file_path = file_path
         self.data = None
         self.axes = None
