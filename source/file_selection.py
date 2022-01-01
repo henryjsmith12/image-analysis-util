@@ -30,7 +30,7 @@ class FileSelectionWidget(QtGui.QDialog):
     def __init__(self):
         super(FileSelectionWidget, self).__init__()
 
-        # Class variables
+        # Instance variables
         self.file_path = ""
 
         # Subwidgets
@@ -121,7 +121,7 @@ class FileCreationWidget(QtGui.QDialog):
     def __init__(self):
         super(FileCreationWidget, self).__init__()
 
-        # Class variables
+        # Instance variables
         self.data_source_file_path = ""
         self.new_file_dim_labels = "H,K,L"
         self.new_file_path = ""
