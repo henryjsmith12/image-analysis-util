@@ -16,6 +16,8 @@ from pyqtgraph import QtGui, QtCore
 class ImageController(QtGui.QWidget):
     """
     Controls the orthogonal slice in view and slicing direction.
+
+    TODO: Add "Swap Axes" button/area with radio button grid
     """
 
     def __init__(self, parent) -> None:

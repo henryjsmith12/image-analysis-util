@@ -16,6 +16,8 @@ from pyqtgraph import QtGui, QtCore
 class ROIWindow(QtGui.QWidget):
     """
     Houses ROI widgets.
+
+    TODO: Populate widget with subwidgets/layout
     """
 
     def __init__(self, parent) -> None:

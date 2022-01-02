@@ -17,11 +17,15 @@ from pyqtgraph import QtGui, QtCore
 class ImagePlot(pg.ImageView):
     """
     A custom pyqtgraph ImageView that plots orthogonal slices from the dataset.
+
+    TODO: Populate plot()
     """
 
     def __init__(self, parent=None, view=None) -> None:
         super(ImagePlot, self).__init__(parent, view=pg.PlotItem())
         self.main_window = parent
+
+        self.color_map = None
 
         #self.ui.histogram.hide()
         self.ui.roiBtn.hide()

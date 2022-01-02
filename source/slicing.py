@@ -15,7 +15,9 @@ from pyqtgraph import QtGui, QtCore
 
 class SlicingWindow(QtGui.QWidget):
     """
-    Houses Slicing widgets.
+    Houses slicing widgets.
+
+    TODO: Populate widget with subwidgets/layout
     """
 
     def __init__(self, parent) -> None:

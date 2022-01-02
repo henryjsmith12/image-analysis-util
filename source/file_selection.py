@@ -250,11 +250,16 @@ class FileCreationWidget(QtGui.QDialog):
 class DataSource:
     """
     Functions for loading data from particular data sources.
+
+    TODO: Add 4D VTI function
+    TODO: Add 3D SPEC function
     """
     
     def loadVTIDataSource(file_path):
         """
         Reads data and axes from .vti file.
+
+        *** This function only works for 3D datasets
         """
 
         # Reads the VTK XML ImageData file format
