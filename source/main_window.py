@@ -62,7 +62,7 @@ class MainWindow(QtGui.QWidget):
 
     def createWidgets(self):
         """
-        
+        Instantiates widgets used in main window.
         """
 
         self.image_plot = ImagePlot(self)
@@ -74,7 +74,9 @@ class MainWindow(QtGui.QWidget):
 
     def createWidgetDocks(self):
         """
-        
+        - Creates docks, 
+        - Adds instantiated widgets to docks,
+        - Adds docks to dock area.
         """
 
         self.image_plot_dock = Dock("ImagePlot", size=(100, 100), hideTitle=True)
