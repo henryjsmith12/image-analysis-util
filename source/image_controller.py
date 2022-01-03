@@ -17,6 +17,7 @@ class ImageController(QtGui.QWidget):
     """
     Controls the orthogonal slice in view and slicing direction.
 
+    TODO: Add 2 different layouts of controllers, based on # dim.
     TODO: Add "Swap Axes" button/area with radio button grid
     """
 
