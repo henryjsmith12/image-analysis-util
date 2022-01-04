@@ -50,6 +50,7 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 * [X] .iau file creator
 * [X] .vti to .iau conversion demo
 * [ ] Basic analysis window
+* [ ] In-line usage
 
 ## License
 
