@@ -1,4 +1,4 @@
-name: ia-util-venv
+name: iautil-venv
 dependencies:
   - python=3.7
   - numpy=1.20.*
