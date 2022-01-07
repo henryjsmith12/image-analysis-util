@@ -11,7 +11,6 @@ import os
 from typing import List, Tuple
 import vtk
 from vtk.util import numpy_support as npSup # type: ignore
-import warnings
 import xarray as xr
 
 # ----------------------------------------------------------------------------------
@@ -50,12 +49,7 @@ def create_iau_file (
             f"{data_source} is an invalid path."
         )
 
-    # iau_file_path validation
-    elif not os.path.isfile(iau_file_path):
-        raise OSError(
-            f"{iau_file_path} is an invalid path."
-        )
-
+    # Load data and axes from data source
     data, axes = None, None
     
     # Data source as directory
@@ -73,12 +67,19 @@ def create_iau_file (
         if new_axis_values is None:
             new_axis_values = [i for i in range(data.shape[-1])]
         axes.append(new_axis_values)
-
     # Data source as file
     elif os.path.isfile(data_source):
         data, axes = load_data_source(data_source)
 
-    # Create .iau file
+    # Handles axis labels
+    if axis_labels is None:
+        axis_labels = [f"axis_{i}" for i in range(data.ndim)]
+    elif len(axis_labels) != data.ndim:
+        raise ValueError(
+            f"Invalid number of axis labels. Expected # of labels: {data.ndim}"
+        )
+
+    # Creates .iau file
     with h5py.File(iau_file_path, 'a') as new_file:
         new_file.create_dataset("data", data=data)
         new_file.create_dataset("metadata", data=str(metadata))
@@ -93,7 +94,7 @@ def create_iau_file (
 
 # ----------------------------------------------------------------------------------
 
-def load_iau_file(file: str) -> xr.Dataset:
+def load_iau_file(file: str) -> xr.DataArray:
     """
     Retrieves data, axis info, and metadata from .iau file in an xarray dataset.
 
@@ -101,9 +102,12 @@ def load_iau_file(file: str) -> xr.Dataset:
         file (str): .iau file to load.
 
     Returns:
-        dataset (xr.Dataset): Dataset containing data, axis info, and metadata.
+        dataset (xr.DataArray): Dataset containing data, axis info, and metadata.
     """
-    ...
+    
+    with h5py.File(file, 'r') as iau_file:
+        data = iau_file["data"][...]
+
 
 # ----------------------------------------------------------------------------------
 
@@ -192,4 +196,4 @@ def load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
 
 # ----------------------------------------------------------------------------------
 
-create_iau_file("./examples/example_files/scan40.vti")
+create_iau_file("./examples/example_files/scan40.vti", "./test.iau", ["e"])
