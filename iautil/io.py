@@ -107,7 +107,7 @@ def load_iau_file(file: str) -> xr.DataArray:
     
     with h5py.File(file, 'r') as iau_file:
         data = iau_file["data"][...]
-
+        
 
 # ----------------------------------------------------------------------------------
 
@@ -196,4 +196,4 @@ def load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
 
 # ----------------------------------------------------------------------------------
 
-create_iau_file("./examples/example_files/scan40.vti", "./test.iau", ["e"])
+create_iau_file("./examples/example_files/scan40.vti", "./test.iau")
