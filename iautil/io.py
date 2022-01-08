@@ -1,6 +1,6 @@
 """
-Houses basic I/O functions for creating/loading .iau files and reading
-from various file types.
+Houses basic I/O functions for creating/loading .iau files and reading from 
+various file types.
 """
 
 # ----------------------------------------------------------------------------------
@@ -108,7 +108,6 @@ def load_iau_file(file: str) -> xr.DataArray:
     with h5py.File(file, 'r') as iau_file:
         data = iau_file["data"][...]
         
-
 # ----------------------------------------------------------------------------------
 
 def load_data_source(file: str) -> Tuple[np.ndarray, List[list]]:
