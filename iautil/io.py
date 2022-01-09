@@ -29,7 +29,6 @@ def create_iau_file (
     new_axis_values: List = None,
     metadata: dict = None
 ) -> None:
-
     """
     Creates .iau file from data source. Data source can either be a single file
     or a directory of multiple data source files.
@@ -194,5 +193,3 @@ def load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
     return data, axes
 
 # ----------------------------------------------------------------------------------
-
-create_iau_file("./examples/example_files/scan40.vti", "./test.iau")
