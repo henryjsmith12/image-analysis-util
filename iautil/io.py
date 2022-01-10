@@ -5,8 +5,8 @@ various file types.
 
 # ----------------------------------------------------------------------------------
 
+import ast
 import h5py
-import itertools
 import numpy as np
 import os
 from typing import List, Tuple
@@ -82,7 +82,7 @@ def create_iau_file (
     # Creates .iau file
     with h5py.File(iau_file_path, 'a') as new_file:
         new_file.create_dataset("data", data=data)
-        new_file.create_dataset("metadata", data=str(metadata))
+        new_file.attrs["metadata"] = str(metadata)
         new_file.create_group("axes")
 
         for i in range(len(axes)):
@@ -105,9 +105,22 @@ def load_iau_file(file: str) -> xr.DataArray:
         dataset (xr.DataArray): Dataset containing data, axis info, and metadata.
     """
     
+    # Reads info from .iau file
     with h5py.File(file, 'r') as iau_file:
         data = iau_file["data"][...]
-        
+        axes = [iau_file["data"].dims[i][0][...] for i in range(data.ndim)]
+        axis_labels = [iau_file["data"].dims[i].label for i in range(data.ndim)]
+        metadata = ast.literal_eval(iau_file.attrs["metadata"])
+
+    # Creates xarray DataArray from .iau info
+    # Internal data structure for everything in image-analysis-util
+    dataset = xr.DataArray(
+        data=data, 
+        coords=axes, 
+        dims=axis_labels, 
+        attrs=metadata)
+
+    return dataset
 # ----------------------------------------------------------------------------------
 
 def load_data_source(file: str) -> Tuple[np.ndarray, List[list]]:
@@ -210,3 +223,14 @@ def load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
     return data, axes
 
 # ----------------------------------------------------------------------------------
+
+"""
+create_iau_file(
+    data_source="./examples/example_files/scan40.vti",
+    iau_file_path="./examples/example_files/scan40.iau",
+    axis_labels=["H", "K", "L"],
+    metadata={"name": "scan40"}
+)
+
+load_iau_file("./examples/example_files/scan40.iau")
+"""
