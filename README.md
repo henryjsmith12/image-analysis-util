@@ -17,7 +17,7 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 ### Prerequisites
 
 * [Python 3.7+](https://www.python.org/downloads/)
-* [Anaconda](https://www.anaconda.com/products/individual)
+* [Anaconda 3](https://www.anaconda.com/products/individual)
 
 ### Installation
 
@@ -35,11 +35,6 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 
    ```
    conda activate ia-util-venv
-   ```
-4. Run program
-
-   ```
-   python image-analysis-util.py
    ```
 
 ## Usage
