@@ -6,6 +6,7 @@ various file types.
 # ----------------------------------------------------------------------------------
 
 import h5py
+import itertools
 import numpy as np
 import os
 from typing import List, Tuple
@@ -147,7 +148,23 @@ def stitch(
         data (np.ndarray): Stacked data arrays; n + 1 dimensions.
         axes (list[list]): Axis values from each axis.
     """
-    ...
+    
+    data, axes = None, None
+
+    # Checks if axes stay consistent throughout data source files
+    consistent_axes = axes_list.count(axes_list[0]) == len(axes_list)
+
+    if consistent_axes:
+        axes = axes_list[0]
+    else:
+        raise ValueError(
+            "Inconsistent axes throughout data source files."
+        )
+
+    # Converts list of NumPy arrays (ndim = n) to one NumPy array (ndim = n + 1)
+    data = np.stack(data_list, axis=-1)
+    
+    return data, axes
 
 # ----------------------------------------------------------------------------------
 
