@@ -21,6 +21,8 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 
 ### Installation
 
+#### Conda Installation
+
 1. Clone the repositiory
 
    ```
@@ -41,11 +43,9 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 
 ## Roadmap
 
-* [X] .iau file selector
-* [X] .iau file creator
-* [X] .vti to .iau conversion demo
-* [ ] Basic analysis window
-* [ ] In-line usage
+* [X] .iau file creation and loading functions
+* [ ] PyPI installation option
+* [ ] Basic Image Tool
 
 ## License
 
