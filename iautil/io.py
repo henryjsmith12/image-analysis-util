@@ -59,10 +59,10 @@ def create_iau_file (
         data_list, axes_list = [], []
 
         for file in file_list:
-            data, axes = load_data_source(str(os.path.join(data_source, file)))
+            data, axes = _load_data_source(str(os.path.join(data_source, file)))
             data_list.append(data)
             axes_list.append(axes)
-        data, axes = stitch(data_list, axes_list)
+        data, axes = _stitch(data_list, axes_list)
 
         # Handles new axis values 
         if new_axis_values is None:
@@ -70,7 +70,7 @@ def create_iau_file (
         axes.append(new_axis_values)
     # Data source as file
     elif os.path.isfile(data_source):
-        data, axes = load_data_source(data_source)
+        data, axes = _load_data_source(data_source)
 
     # Handles axis labels
     if axis_labels is None:
@@ -119,13 +119,14 @@ def load_iau_file(file: str) -> xr.DataArray:
         data=data, 
         coords=axes, 
         dims=axis_labels, 
-        attrs=metadata)
+        attrs=metadata
+    )
 
     return dataset
     
 # ----------------------------------------------------------------------------------
 
-def load_data_source(file: str) -> Tuple[np.ndarray, List[list]]:
+def _load_data_source(file: str) -> Tuple[np.ndarray, List[list]]:
     """
     Retrieves data and axis values from data source file.
 
@@ -141,18 +142,18 @@ def load_data_source(file: str) -> Tuple[np.ndarray, List[list]]:
     data, axes = None, None
 
     if file_ext == ".vti":
-        data, axes = load_vti(file)
+        data, axes = _load_vti(file)
 
     return data, axes
 
 # ----------------------------------------------------------------------------------
 
-def stitch(
+def _stitch(
     data_list: List[np.ndarray],
     axes_list: List[list]
 ) -> Tuple[np.ndarray, List[list]]:
     """
-    Stitches data from multiple data source files. Also checks for inconsistencies 
+    _stitches data from multiple data source files. Also checks for inconsistencies 
     in axis values.
 
     Parameters:
@@ -183,7 +184,7 @@ def stitch(
 
 # ----------------------------------------------------------------------------------
 
-def load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
+def _load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
     """
     Retrieves data, axis values from .vti (VTK XML image format) file.
     .vti files contain 2D or 3D datasets.
