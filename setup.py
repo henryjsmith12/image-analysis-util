@@ -14,7 +14,7 @@ setup(
     description="Scientific image exploration software for multidimensional datasets.",
     author="Henry Smith",
     author_email="smithh@anl.gov",
-    url="https://github.com/henryjsmith12/image-analysis-util",
+    url="https://github.com/henryjsmith12/image-analysis-util/iautil",
     install_requires=[
         "h5py",
         "numpy",
