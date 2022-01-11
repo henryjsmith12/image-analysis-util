@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------------------
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # ----------------------------------------------------------------------------------
 
@@ -24,6 +24,7 @@ setup(
         "vtk",
         "xarray",
     ],
+    packages=find_packages(),
     license="See LICENSE file",
     platforms="any",
 )
