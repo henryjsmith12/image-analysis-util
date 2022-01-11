@@ -54,11 +54,12 @@ def create_iau_file (
     
     # Data source as directory
     if os.path.isdir(data_source):
-        file_list = os.listdir(data_source).sort() # directory contents, sorted
+        file_list = os.listdir(data_source) # directory contents, sorted
+        file_list.sort()
         data_list, axes_list = [], []
 
         for file in file_list:
-            data, axes = load_data_source(file)
+            data, axes = load_data_source(str(os.path.join(data_source, file)))
             data_list.append(data)
             axes_list.append(axes)
         data, axes = stitch(data_list, axes_list)
@@ -121,6 +122,7 @@ def load_iau_file(file: str) -> xr.DataArray:
         attrs=metadata)
 
     return dataset
+    
 # ----------------------------------------------------------------------------------
 
 def load_data_source(file: str) -> Tuple[np.ndarray, List[list]]:
@@ -184,6 +186,7 @@ def stitch(
 def load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
     """
     Retrieves data, axis values from .vti (VTK XML image format) file.
+    .vti files contain 2D or 3D datasets.
 
     Parameters:
         file (str): .vti file to load.
@@ -224,13 +227,11 @@ def load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
 
 # ----------------------------------------------------------------------------------
 
-"""
-create_iau_file(
-    data_source="./examples/example_files/scan40.vti",
-    iau_file_path="./examples/example_files/scan40.iau",
-    axis_labels=["H", "K", "L"],
-    metadata={"name": "scan40"}
-)
+"""create_iau_file(
+    data_source="./examples/example_files",
+    iau_file_path="./examples/example_files/scans.iau",
+    axis_labels=["H", "K", "L", "V"],
+    metadata={"name": "scans"}
+)"""
 
-load_iau_file("./examples/example_files/scan40.iau")
-"""
+#load_iau_file("./examples/example_files/scans.iau")
