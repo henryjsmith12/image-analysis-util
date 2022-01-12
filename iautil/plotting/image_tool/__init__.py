@@ -26,3 +26,15 @@ class ImageTool(QtGui.QApplication):
         super(ImageTool).__init__()
 
         self.data_array = data_array
+
+# ----------------------------------------------------------------------------------
+
+class ImageToolWidget(QtGui.QWidget):
+    ...
+
+# ----------------------------------------------------------------------------------
+
+class ImageToolLayout(QtGui.QGridLayout):
+    ...
+
+# ----------------------------------------------------------------------------------
