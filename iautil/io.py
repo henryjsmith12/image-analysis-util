@@ -1,5 +1,5 @@
 """
-Houses basic I/O functions for creating/loading .iau files and reading from 
+Basic I/O functions for creating/loading .iau files and reading from 
 various file types.
 """
 
@@ -103,7 +103,7 @@ def load_iau_file(file: str) -> xr.DataArray:
         file (str): .iau file to load.
 
     Returns:
-        dataset (xr.DataArray): Dataset containing data, axis info, and metadata.
+        data_array (xr.DataArray): Dataset containing data, axis info, and metadata.
     """
     
     # Reads info from .iau file
@@ -115,14 +115,14 @@ def load_iau_file(file: str) -> xr.DataArray:
 
     # Creates xarray DataArray from .iau info
     # Internal data structure for everything in image-analysis-util
-    dataset = xr.DataArray(
+    data_array = xr.DataArray(
         data=data, 
         coords=axes, 
         dims=axis_labels, 
         attrs=metadata
     )
 
-    return dataset
+    return data_array
     
 # ----------------------------------------------------------------------------------
 
