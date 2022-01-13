@@ -21,6 +21,12 @@ Scientific image exploration software for 3D and 4D datasets. A continuation of 
 
 ### Installation
 
+#### PyPI Installation
+
+```
+pip install image-analysis-util
+```
+
 #### Conda Installation
 
 1. Clone the repositiory
