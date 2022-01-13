@@ -50,7 +50,7 @@ pip install image-analysis-util
 ## Roadmap
 
 * [X] .iau file creation and loading functions
-* [ ] PyPI installation option
+* [X] PyPI installation option
 * [ ] Basic Image Tool
 
 ## License
