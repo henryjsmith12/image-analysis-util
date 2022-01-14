@@ -76,7 +76,7 @@ class ImageToolWidget(QtGui.QWidget):
         """
 
         self.data_array_image_view_dock = dockarea.Dock(
-            name="Data Array Plot",
+            name="DataArray ImageView",
             size=(200, 200),
             widget=self.data_array_image_view,
             hideTitle=True
