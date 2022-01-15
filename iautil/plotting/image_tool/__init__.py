@@ -4,6 +4,8 @@ A general tool for plotting, slicing, and analyzing xarray DataArrays.
 
 # ----------------------------------------------------------------------------------
 
+from iautil.plotting.image_tool import DataArrayController
+from iautil.utilities.ui import DataArrayImageView
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import dockarea, QtGui, QtCore
@@ -12,34 +14,19 @@ import xarray as xr
 # ----------------------------------------------------------------------------------
 
 __all__ = (
-    "ImageTool",
-    "ImageToolWidget"
+    "image_tool",
+    "ImageTool"
 )
 
 # ----------------------------------------------------------------------------------
 
-class ImageTool:
-    """
-    
-    """
-    
-    def __init__(self, data_array: xr.DataArray) -> None:  
-        self.data_array = data_array
-
-        self.app = pg.mkQApp("Image Analysis")
-        self.image_tool_widget = ImageToolWidget(data_array)
-        self.image_tool_widget.show()
-        self.app.exec_()
-
-# ----------------------------------------------------------------------------------
-
-class ImageToolWidget(QtGui.QWidget):
+class ImageTool(QtGui.QWidget):
     """
 
     """
 
     def __init__(self, data_array: xr.DataArray) -> None:
-        super(ImageToolWidget, self).__init__()
+        super(ImageTool, self).__init__()
 
         self.data_array = data_array
 
@@ -65,8 +52,8 @@ class ImageToolWidget(QtGui.QWidget):
         """
         
         # Generic placeholder widgets
-        self.data_array_image_view = pg.ImageView()
-        self.controller_widget = QtGui.QWidget()
+        self.data_array_image_view = DataArrayImageView()
+        self.controller_widget = DataArrayController()
 
     # ------------------------------------------------------------------------------
     
@@ -94,4 +81,7 @@ class ImageToolWidget(QtGui.QWidget):
 
 # ----------------------------------------------------------------------------------
 
-ImageTool(xr.DataArray(np.array([1,2,3])))
+app = pg.mkQApp()
+tool = ImageTool(xr.DataArray([1, 2, 3]))
+tool.show()
+app.exec_()
