@@ -4,8 +4,8 @@ A general tool for plotting, slicing, and analyzing xarray DataArrays.
 
 # ----------------------------------------------------------------------------------
 
-from iautil.plotting.image_tool import DataArrayController
-from iautil.utilities.ui import DataArrayImageView
+#from iautil.plotting.image_tool import DataArrayController
+#from iautil.utilities.ui import DataArrayImageView
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import dockarea, QtGui, QtCore
@@ -14,9 +14,19 @@ import xarray as xr
 # ----------------------------------------------------------------------------------
 
 __all__ = (
-    "image_tool",
-    "ImageTool"
+    "ImageTool",
+    "ImageToolWidget"
 )
+
+# ----------------------------------------------------------------------------------
+
+"""class ImageTool:
+
+    def __init__(self, data_array: xr.DataArray) -> None:
+        app = pg.mkQApp()
+        image_tool_widget = ImageToolWidget(data_array)
+        image_tool_widget.show()
+        app.exec_()"""
 
 # ----------------------------------------------------------------------------------
 
@@ -30,11 +40,11 @@ class ImageTool(QtGui.QWidget):
 
         self.data_array = data_array
 
-        self.data_array_plot = None
+        self.data_array_image_view = None
         self.controller_widget = None
 
         self.dock_area = dockarea.DockArea()
-        self.data_array_plot_dock = None
+        self.data_array_image_view_dock = None
         self.controller_widget_dock = None
         
         self._create_widgets()
@@ -52,9 +62,12 @@ class ImageTool(QtGui.QWidget):
         """
         
         # Generic placeholder widgets
-        self.data_array_image_view = DataArrayImageView()
-        self.controller_widget = DataArrayController()
+        self.data_array_image_view = pg.ImageView()
+        self.controller_widget = QtGui.QWidget()
 
+        #self.data_array_image_view = DataArrayImageView()
+        #self.controller_widget = DataArrayController()
+        
     # ------------------------------------------------------------------------------
     
     def _create_docks(self) -> None:
@@ -80,8 +93,3 @@ class ImageTool(QtGui.QWidget):
         self.dock_area.addDock(self.controller_widget_dock)
 
 # ----------------------------------------------------------------------------------
-
-app = pg.mkQApp()
-tool = ImageTool(xr.DataArray([1, 2, 3]))
-tool.show()
-app.exec_()
