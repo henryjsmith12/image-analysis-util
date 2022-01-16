@@ -6,6 +6,7 @@ UI widget classes.
 
 import pyqtgraph as pg
 from pyqtgraph import QtGui, QtCore
+import xarray as xr
 
 # ----------------------------------------------------------------------------------
 
@@ -29,6 +30,10 @@ class DataArrayImageView(pg.ImageView):
         levelMode='mono'
     ) -> None:
         super(DataArrayImageView).__init__(parent, view, imageItem, levelMode)
+
+
+    def setImage(data_array: xr.DataArray):
+        ...
 
 # ----------------------------------------------------------------------------------
 
