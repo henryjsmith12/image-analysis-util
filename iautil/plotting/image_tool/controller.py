@@ -166,17 +166,3 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
             )
 
 # ----------------------------------------------------------------------------------
-
-from iautil.plotting.image_tool import ImageTool
-
-it = ImageTool(
-    xr.DataArray(
-        [
-            [1234, 3456, 3456], 
-            [2345, 56, 456], 
-            [3456, 345, 4567]
-        ]
-    )
-)
-
-it.show()
