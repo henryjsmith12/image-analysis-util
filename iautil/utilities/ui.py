@@ -25,19 +25,8 @@ class DataArrayImageView(pg.ImageView):
     def __init__(self, parent=None) -> None:
         super(DataArrayImageView, self).__init__(
             parent, 
-            view=pg.PlotItem(),
-            imageItem=pg.ImageItem()
+            view=pg.PlotItem()
         )
-
-    # ------------------------------------------------------------------------------
-
-    def setDataArray(self, data_array_slice: xr.DataArray):
-        """
-        
-        """
-
-        image = data_array_slice.values
-        self.setImage(image)
 
 # ----------------------------------------------------------------------------------
 
@@ -50,4 +39,3 @@ class DataArrayPlot(pg.PlotWidget):
         super(DataArrayPlot, self).__init__(parent, plotItem)
 
 # ----------------------------------------------------------------------------------
-
