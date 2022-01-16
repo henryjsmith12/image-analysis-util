@@ -115,10 +115,8 @@ class DataArrayController(QtGui.QWidget):
                 str_numpy_args += ","
         
         numpy_args = eval(f'np.s_[{str_numpy_args}]')
-
-        if not self.parent is None:
-            self.parent.data_array_image_view.setImage(self.data_array[numpy_args])
-
+        data_array_cut = self.data_array[numpy_args].values
+        
 # ----------------------------------------------------------------------------------
 
 class DataArrayControllerLayout(QtGui.QGridLayout):
@@ -163,7 +161,6 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
             self.dim_currval_cbx_list[i].currentIndexChanged.connect(
                 parent._update_currval
             )
-
 
 # ----------------------------------------------------------------------------------
 
