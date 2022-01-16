@@ -66,8 +66,9 @@ class ImageToolWidget(QtGui.QWidget):
         
         """
         from iautil.plotting.image_tool.controller import DataArrayController
+        from iautil.utilities.ui import DataArrayImageView
         
-        self.data_array_image_view = pg.ImageView()
+        self.data_array_image_view = DataArrayImageView()
         self.controller_widget = DataArrayController(self.data_array, self)
         
     # ------------------------------------------------------------------------------
