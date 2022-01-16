@@ -26,9 +26,10 @@ class DataArrayController(QtGui.QWidget):
     
     """
 
-    def __init__(self, data_array: xr.DataArray) -> None:
-        super(DataArrayController, self).__init__()
+    def __init__(self, data_array: xr.DataArray, parent=None) -> None:
+        super(DataArrayController, self).__init__(parent)
 
+        self.parent = parent
         self.data_array = data_array
         
         self.layout = DataArrayControllerLayout(data_array, parent=self)
@@ -59,6 +60,8 @@ class DataArrayController(QtGui.QWidget):
             currval_index = self.sender().currentIndex()
             self.dim_slider_list[dim].setValue(currval_index)
 
+        self._update_image_view()
+
     # ------------------------------------------------------------------------------
 
     def _update_axes(self) -> None:
@@ -70,7 +73,11 @@ class DataArrayController(QtGui.QWidget):
             new_axis = self.sender().currentIndex()
             axes = [i for i in range(self.data_array.ndim)]
             curr_axes = [cbx.currentIndex() for cbx in self.dim_axis_cbx_list]
-            axis_to_add = list(set(axes) - set(curr_axes))[0]
+            
+            try:
+                axis_to_add = list(set(axes) - set(curr_axes))[0]
+            except:
+                pass
 
         for i in range(self.data_array.ndim):
             cbx = self.dim_axis_cbx_list[i]
@@ -85,6 +92,32 @@ class DataArrayController(QtGui.QWidget):
             else:
                 self.dim_slider_list[i].setEnabled(True)
                 self.dim_currval_cbx_list[i].setEnabled(True)
+
+        self._update_image_view()
+
+    # ------------------------------------------------------------------------------
+
+    def _update_image_view(self) -> None:
+        """
+        
+        """
+
+        image_view_image = None
+        str_numpy_args = ""
+
+        for i in range(self.data_array.ndim):
+            if self.dim_slider_list[i].isEnabled():
+                str_numpy_args += f"{self.dim_slider_list[i].value()}"
+            else:
+                str_numpy_args += ":"
+
+            if i < self.data_array.ndim - 1:
+                str_numpy_args += ","
+        
+        numpy_args = eval(f'np.s_[{str_numpy_args}]')
+
+        if not self.parent is None:
+            self.parent.data_array_image_view.setImage(self.data_array[numpy_args])
 
 # ----------------------------------------------------------------------------------
 
