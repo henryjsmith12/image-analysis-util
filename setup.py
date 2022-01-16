@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup( 
     name="image-analysis-util",
-    version="0.0.5",
+    version="0.0.6",
     description="Scientific image exploration software for multidimensional datasets.",
     author="Henry Smith",
     author_email="smithh@anl.gov",
