@@ -22,12 +22,16 @@ class DataArrayImageView(pg.ImageView):
     A custom PyQtGraph ImageView.
     """
     
-    def __init__(self, parent=None, view=pg.PlotWidget()) -> None:
-        super(DataArrayImageView, self).__init__(parent, view)
+    def __init__(self, parent=None) -> None:
+        super(DataArrayImageView, self).__init__(
+            parent, 
+            view=pg.PlotItem(),
+            imageItem=pg.ImageItem()
+        )
 
     # ------------------------------------------------------------------------------
 
-    def setImage(self, data_array_slice: xr.DataArray):
+    def setDataArray(self, data_array_slice: xr.DataArray):
         """
         
         """
