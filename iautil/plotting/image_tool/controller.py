@@ -117,7 +117,8 @@ class DataArrayController(QtGui.QWidget):
         numpy_args = eval(f'np.s_[{str_numpy_args}]')
         data_array_slice = self.data_array[numpy_args]
 
-        print(data_array_slice.values.shape)
+        if data_array_slice.values.ndim != 0:
+            self.parent.data_array_image_view.setImage(data_array_slice.values)
         
 # ----------------------------------------------------------------------------------
 
@@ -165,3 +166,17 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
             )
 
 # ----------------------------------------------------------------------------------
+
+from iautil.plotting.image_tool import ImageTool
+
+it = ImageTool(
+    xr.DataArray(
+        [
+            [1234, 3456, 3456], 
+            [2345, 56, 456], 
+            [3456, 345, 4567]
+        ]
+    )
+)
+
+it.show()
