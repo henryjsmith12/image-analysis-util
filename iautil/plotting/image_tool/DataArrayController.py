@@ -17,11 +17,7 @@ __all__ = (
 
 # ----------------------------------------------------------------------------------
 
-DIMENSION_LOCATIONS = [
-    "x-axis",
-    "y-axis",
-    ""
-]
+AXES = ["x", "y", "z", "t"]
 
 # ----------------------------------------------------------------------------------
 
@@ -34,15 +30,17 @@ class DataArrayController(QtGui.QWidget):
         super(DataArrayController, self).__init__()
 
         self.data_array = data_array
-        self.updated = False
-
+        
         self.layout = DataArrayControllerLayout(data_array, parent=self)
         self.setLayout(self.layout)
 
         self.dim_lbl_list = self.layout.dim_lbl_list
-        self.dim_location_cbx_list = self.layout.dim_location_cbx_list
+        self.dim_axis_cbx_list = self.layout.dim_axis_cbx_list
         self.dim_slider_list = self.layout.dim_slider_list
         self.dim_currval_cbx_list = self.layout.dim_currval_cbx_list
+
+        self._update_currval()
+        self._update_axes()
 
     # ------------------------------------------------------------------------------
 
@@ -51,23 +49,42 @@ class DataArrayController(QtGui.QWidget):
         
         """
         
-        if isinstance(self.sender(), QtGui.QSlider) and not self.updated:
+        if isinstance(self.sender(), QtGui.QSlider):
             dim = self.dim_slider_list.index(self.sender())
-            index = self.sender().value()
-            self.dim_currval_cbx_list[dim].setCurrentIndex(index)
-            #self.updated = True
-        if isinstance(self.sender(), QtGui.QComboBox) and not self.updated:
+            currval_index = self.sender().value()
+            self.dim_currval_cbx_list[dim].setCurrentIndex(currval_index)
+
+        if isinstance(self.sender(), QtGui.QComboBox):
             dim = self.dim_currval_cbx_list.index(self.sender())
-            index = self.sender().currentIndex()
-            self.dim_slider_list[dim].setValue(index)
-            #self.updated = True
+            currval_index = self.sender().currentIndex()
+            self.dim_slider_list[dim].setValue(currval_index)
 
     # ------------------------------------------------------------------------------
 
-    def _update_location(self) -> None:
+    def _update_axes(self) -> None:
         """
         
         """
+
+        if not self.sender() is None:
+            new_axis = self.sender().currentIndex()
+            axes = [i for i in range(self.data_array.ndim)]
+            curr_axes = [cbx.currentIndex() for cbx in self.dim_axis_cbx_list]
+            axis_to_add = list(set(axes) - set(curr_axes))[0]
+
+        for i in range(self.data_array.ndim):
+            cbx = self.dim_axis_cbx_list[i]
+
+            if not self.sender() is None:
+                if cbx.currentIndex() == new_axis and not cbx == self.sender():
+                    cbx.setCurrentIndex(axis_to_add)
+
+            if cbx.currentIndex() <= 1:
+                self.dim_slider_list[i].setEnabled(False)
+                self.dim_currval_cbx_list[i].setEnabled(False)
+            else:
+                self.dim_slider_list[i].setEnabled(True)
+                self.dim_currval_cbx_list[i].setEnabled(True)
 
 # ----------------------------------------------------------------------------------
 
@@ -80,35 +97,40 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
         super(DataArrayControllerLayout, self).__init__(parent)
 
         self.dim_lbl_list = []
-        self.dim_location_cbx_list = []
+        self.dim_axis_cbx_list = []
         self.dim_slider_list = []
         self.dim_currval_cbx_list = []
+        axes = AXES[:data_array.ndim]
 
         for i in range(data_array.ndim):
             dim_lbl = data_array.dims[i]
             dim_coords = map(str, data_array.coords[dim_lbl].values)
 
             self.dim_lbl_list.append(QtGui.QLabel(dim_lbl))
-            self.dim_location_cbx_list.append(QtGui.QComboBox())
+            self.dim_axis_cbx_list.append(QtGui.QComboBox())
             self.dim_slider_list.append(QtGui.QSlider(QtCore.Qt.Horizontal))
             self.dim_currval_cbx_list.append(QtGui.QComboBox())
 
-            self.dim_location_cbx_list[i].addItems(DIMENSION_LOCATIONS)
-            self.dim_location_cbx_list[i].setCurrentIndex(i)
+            self.dim_axis_cbx_list[i].addItems(axes)
+            self.dim_axis_cbx_list[i].setCurrentIndex(i)
             self.dim_slider_list[i].setMaximum(data_array.shape[i] - 1)
             self.dim_currval_cbx_list[i].addItems(dim_coords)
 
             self.addWidget(self.dim_lbl_list[i], i, 0)
-            self.addWidget(self.dim_location_cbx_list[i], i, 1)
+            self.addWidget(self.dim_axis_cbx_list[i], i, 1)
             self.addWidget(self.dim_slider_list[i], i, 2, 1, 3)
             self.addWidget(self.dim_currval_cbx_list[i], i, 5)
 
+            self.dim_axis_cbx_list[i].currentIndexChanged.connect(
+                parent._update_axes
+            )
             self.dim_slider_list[i].valueChanged.connect(
                 parent._update_currval
             )
-            self.dim_currval_cbx_list[i].valueChanged.connect(
+            self.dim_currval_cbx_list[i].currentIndexChanged.connect(
                 parent._update_currval
             )
+
 
 # ----------------------------------------------------------------------------------
 
@@ -125,4 +147,4 @@ ctrl = DataArrayController(
 )
 ctrl.show()
 app.exec_()
-
+ 
