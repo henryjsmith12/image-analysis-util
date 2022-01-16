@@ -4,8 +4,8 @@ A general tool for plotting, slicing, and analyzing xarray DataArrays.
 
 # ----------------------------------------------------------------------------------
 
-#from iautil.plotting.image_tool import DataArrayController
-#from iautil.utilities.ui import DataArrayImageView
+from iautil.plotting.image_tool import DataArrayController
+from iautil.utilities.ui import DataArrayImageView
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import dockarea, QtGui, QtCore
@@ -20,23 +20,26 @@ __all__ = (
 
 # ----------------------------------------------------------------------------------
 
-"""class ImageTool:
+class ImageTool:
+    """
+    
+    """
 
     def __init__(self, data_array: xr.DataArray) -> None:
         app = pg.mkQApp()
         image_tool_widget = ImageToolWidget(data_array)
         image_tool_widget.show()
-        app.exec_()"""
+        app.exec_()
 
 # ----------------------------------------------------------------------------------
 
-class ImageTool(QtGui.QWidget):
+class ImageToolWidget(QtGui.QWidget):
     """
 
     """
 
     def __init__(self, data_array: xr.DataArray) -> None:
-        super(ImageTool, self).__init__()
+        super(ImageToolWidget, self).__init__()
 
         self.data_array = data_array
 
@@ -62,11 +65,11 @@ class ImageTool(QtGui.QWidget):
         """
         
         # Generic placeholder widgets
-        self.data_array_image_view = pg.ImageView()
-        self.controller_widget = QtGui.QWidget()
+        #self.data_array_image_view = pg.ImageView()
+        #self.controller_widget = QtGui.QWidget()
 
-        #self.data_array_image_view = DataArrayImageView()
-        #self.controller_widget = DataArrayController()
+        self.data_array_image_view = DataArrayImageView()
+        self.controller_widget = DataArrayController()
         
     # ------------------------------------------------------------------------------
     
@@ -93,3 +96,14 @@ class ImageTool(QtGui.QWidget):
         self.dock_area.addDock(self.controller_widget_dock)
 
 # ----------------------------------------------------------------------------------
+
+ImageTool(
+    xr.DataArray(
+        data=np.random.rand(3, 4, 5),
+        coords=[
+            ("DIM_ONE", ["a", "b", "c"]),
+            ("DIM_TWO", [1, 2, 3, 4]),
+            ("DIM_THREE", ["q", "w", "e", "r", "t"])
+        ]
+    )
+)
