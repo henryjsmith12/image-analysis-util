@@ -115,7 +115,12 @@ class DataArrayController(QtGui.QWidget):
                 str_numpy_args += ","
         
         numpy_args = eval(f'np.s_[{str_numpy_args}]')
-        data_array_cut = self.data_array[numpy_args].values
+        data_array_slice = self.data_array[numpy_args]
+
+        try:
+            self.parent.data_array_image_view.setDataArray(data_array_slice)
+        except:
+            pass
         
 # ----------------------------------------------------------------------------------
 
