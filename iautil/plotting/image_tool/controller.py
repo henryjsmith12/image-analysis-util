@@ -163,21 +163,3 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
             )
 
 # ----------------------------------------------------------------------------------
-
-"""
-app = pg.mkQApp()
-ctrl = DataArrayController(
-    xr.DataArray(
-        data=np.random.rand(3, 4, 5),
-        coords=[
-            ("DIM_ONE", ["a", "b", "c"]),
-            ("DIM_TWO", [1, 2, 3, 4]),
-            ("DIM_THREE", ["q", "w", "e", "r", "t"])
-        ]
-    )
-)
-ctrl.show()
-app.exec_()
-"""
-
- 
