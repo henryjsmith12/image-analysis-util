@@ -164,6 +164,7 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
 
 # ----------------------------------------------------------------------------------
 
+"""
 app = pg.mkQApp()
 ctrl = DataArrayController(
     xr.DataArray(
@@ -177,4 +178,6 @@ ctrl = DataArrayController(
 )
 ctrl.show()
 app.exec_()
+"""
+
  
