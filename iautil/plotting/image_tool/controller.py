@@ -23,7 +23,7 @@ AXES = ["x", "y", "z", "t"]
 
 class DataArrayController(QtGui.QWidget):
     """
-    
+    Controller for the ImageTool DataArray.
     """
 
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
