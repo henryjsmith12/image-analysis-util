@@ -53,11 +53,3 @@ class DataArrayPlot(pg.PlotWidget):
         super(DataArrayPlot, self).__init__(parent, plotItem)
 
 # ----------------------------------------------------------------------------------
-
-app = pg.mkQApp()
-imv = pg.ImageView(view=pg.PlotItem())
-imv.view.setLabels(bottom = "X Axis", 
-                     left = "Y1 Axis", 
-                     right = "Y2 Axis")
-imv.show()
-app.exec_()
