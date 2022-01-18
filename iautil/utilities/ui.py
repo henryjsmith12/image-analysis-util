@@ -28,6 +28,9 @@ class DataArrayImageView(pg.ImageView):
             view=pg.PlotItem()
         )
 
+        self.view.setAspectLocked(lock=False)
+        self.view.enableAutoRange()
+
     # ------------------------------------------------------------------------------
 
     def set_data_array(self, data_array: xr.DataArray):
@@ -40,6 +43,7 @@ class DataArrayImageView(pg.ImageView):
             bottom = data_array.dims[0],
             left = data_array.dims[1]
         )
+
         self.setImage(image)
 
 # ----------------------------------------------------------------------------------
