@@ -28,6 +28,15 @@ class DataArrayImageView(pg.ImageView):
             view=pg.PlotItem()
         )
 
+    # ------------------------------------------------------------------------------
+
+    def set_data_array(self, data_array: xr.DataArray):
+        """
+        
+        """
+
+        print(data_array)
+
 # ----------------------------------------------------------------------------------
 
 class DataArrayPlot(pg.PlotWidget):

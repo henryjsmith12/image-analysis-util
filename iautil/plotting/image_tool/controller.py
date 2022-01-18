@@ -118,7 +118,7 @@ class DataArrayController(QtGui.QWidget):
         data_array_slice = self.data_array[numpy_args]
 
         if data_array_slice.values.ndim != 0:
-            self.parent.data_array_image_view.setImage(data_array_slice.values)
+            self.parent.data_array_image_view.set_data_array(data_array_slice)
         
 # ----------------------------------------------------------------------------------
 
