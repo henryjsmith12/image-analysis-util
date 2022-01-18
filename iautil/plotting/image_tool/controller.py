@@ -104,21 +104,33 @@ class DataArrayController(QtGui.QWidget):
 
         image_view_image = None
         str_numpy_args = ""
+        transpose = False
+        x_index, y_index = 0, 0
 
         for i in range(self.data_array.ndim):
             if self.dim_slider_list[i].isEnabled():
                 str_numpy_args += f"{self.dim_slider_list[i].value()}"
             else:
                 str_numpy_args += ":"
+                if self.dim_slider_list[i].currentIndex() == 0:
+                    x_index = i
+                else:
+                    y_index = i
 
             if i < self.data_array.ndim - 1:
                 str_numpy_args += ","
+
+        if y_index < x_index:
+            transpose = True
         
         numpy_args = eval(f'np.s_[{str_numpy_args}]')
         data_array_slice = self.data_array[numpy_args]
 
         if data_array_slice.values.ndim != 0:
-            self.parent.data_array_image_view.set_data_array(data_array_slice)
+            if not transpose:
+                self.parent.data_array_image_view.set_data_array(data_array_slice)
+            else:
+                self.parent.data_array_image_view.set_data_array(data_array_slice.T)
         
 # ----------------------------------------------------------------------------------
 
