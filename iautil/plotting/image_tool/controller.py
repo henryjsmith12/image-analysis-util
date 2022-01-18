@@ -112,7 +112,7 @@ class DataArrayController(QtGui.QWidget):
                 str_numpy_args += f"{self.dim_slider_list[i].value()}"
             else:
                 str_numpy_args += ":"
-                if self.dim_slider_list[i].currentIndex() == 0:
+                if self.dim_axis_cbx_list[i].currentIndex() == 0:
                     x_index = i
                 else:
                     y_index = i
