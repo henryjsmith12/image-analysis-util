@@ -35,7 +35,12 @@ class DataArrayImageView(pg.ImageView):
         
         """
 
-        print(data_array)
+        image = data_array.values
+        self.view.setLabels(
+            bottom = data_array.dims[0],
+            left = data_array.dims[1]
+        )
+        self.setImage(image)
 
 # ----------------------------------------------------------------------------------
 
@@ -48,3 +53,11 @@ class DataArrayPlot(pg.PlotWidget):
         super(DataArrayPlot, self).__init__(parent, plotItem)
 
 # ----------------------------------------------------------------------------------
+
+app = pg.mkQApp()
+imv = pg.ImageView(view=pg.PlotItem())
+imv.view.setLabels(bottom = "X Axis", 
+                     left = "Y1 Axis", 
+                     right = "Y2 Axis")
+imv.show()
+app.exec_()
