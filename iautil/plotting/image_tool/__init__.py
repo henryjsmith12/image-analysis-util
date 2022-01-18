@@ -34,8 +34,6 @@ class ImageTool:
         self.image_tool_widget.show()
         self.app.exec_()
 
-        del self.image_tool_widget, self.app
-
 # ----------------------------------------------------------------------------------
 
 class ImageToolWidget(QtGui.QWidget):
