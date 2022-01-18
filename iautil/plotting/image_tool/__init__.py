@@ -8,6 +8,7 @@ A general tool for plotting, slicing, and analyzing xarray DataArrays.
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import dockarea, QtGui, QtCore
+import sys
 import xarray as xr
 
 # ----------------------------------------------------------------------------------
@@ -31,7 +32,7 @@ class ImageTool:
 
     def show(self):
         self.image_tool_widget.show()
-        self.app.exec_()
+        sys.exit(self.app.exec_())
 
 # ----------------------------------------------------------------------------------
 
