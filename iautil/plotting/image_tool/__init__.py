@@ -32,7 +32,9 @@ class ImageTool:
 
     def show(self):
         self.image_tool_widget.show()
-        sys.exit(self.app.exec_())
+        self.app.exec_()
+
+        del self.image_tool_widget, self.app
 
 # ----------------------------------------------------------------------------------
 
