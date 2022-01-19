@@ -35,7 +35,7 @@ class DataArrayImageView(pg.ImageView):
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
-        
+
         self.view.setAspectLocked(lock=False)
         self.view.enableAutoRange()
 
@@ -56,7 +56,7 @@ class DataArrayImageView(pg.ImageView):
 
     # ------------------------------------------------------------------------------
 
-    def _set_color_map(image: np.ndarray) -> np.ndarray:
+    def _set_color_map(self, image: np.ndarray) -> np.ndarray:
         """
         
         """
