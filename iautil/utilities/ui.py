@@ -4,6 +4,7 @@ UI widget classes.
 
 # ----------------------------------------------------------------------------------
 
+from typing import Tuple
 from matplotlib import colors
 from matplotlib import pyplot as plt
 import numpy as np
@@ -51,7 +52,7 @@ class DataArrayImageView(pg.ImageView):
             bottom = data_array.dims[0],
             left = data_array.dims[1]
         )
-
+        self._set_axis_coords(data_array)
         self.setImage(image)
 
     # ------------------------------------------------------------------------------
@@ -68,6 +69,22 @@ class DataArrayImageView(pg.ImageView):
         color_image = plt.cm.jet(normalized_image)
 
         return color_image
+
+    # ------------------------------------------------------------------------------
+
+    def _set_axis_coords(self, data_array: xr.DataArray) -> None:
+        """
+        
+        """
+
+        x_axis = map(str, data_array.coords[data_array.dims[0]].values)
+        y_axis = map(str, data_array.coords[data_array.dims[1]].values)
+
+        ...
+
+    # ------------------------------------------------------------------------------
+
+    
 
 # ----------------------------------------------------------------------------------
 
