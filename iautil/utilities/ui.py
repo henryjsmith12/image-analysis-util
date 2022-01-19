@@ -4,6 +4,9 @@ UI widget classes.
 
 # ----------------------------------------------------------------------------------
 
+from matplotlib import colors
+from matplotlib import pyplot as plt
+import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtGui, QtCore
 import xarray as xr
@@ -12,7 +15,8 @@ import xarray as xr
 
 __all__ = (
     "DataArrayImageView",
-    "DataArrayPlot"
+    "DataArrayPlot",
+    "set_data_array"
 )
 
 # ----------------------------------------------------------------------------------
@@ -28,23 +32,42 @@ class DataArrayImageView(pg.ImageView):
             view=pg.PlotItem()
         )
 
+        self.ui.histogram.hide()
+        self.ui.roiBtn.hide()
+        self.ui.menuBtn.hide()
+        
         self.view.setAspectLocked(lock=False)
         self.view.enableAutoRange()
 
     # ------------------------------------------------------------------------------
 
-    def set_data_array(self, data_array: xr.DataArray):
+    def set_data_array(self, data_array: xr.DataArray) -> None:
         """
         
         """
 
-        image = data_array.values
+        image = self._set_color_map(data_array.values)
         self.view.setLabels(
             bottom = data_array.dims[0],
             left = data_array.dims[1]
         )
 
         self.setImage(image)
+
+    # ------------------------------------------------------------------------------
+
+    def _set_color_map(image: np.ndarray) -> np.ndarray:
+        """
+        
+        """
+
+        image_max = np.amax(image)
+        norm = colors.LogNorm(vmax=image_max)
+
+        normalized_image = norm(image)
+        color_image = plt.cm.jet(normalized_image)
+
+        return color_image
 
 # ----------------------------------------------------------------------------------
 
