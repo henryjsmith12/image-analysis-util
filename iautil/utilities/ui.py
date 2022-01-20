@@ -53,8 +53,8 @@ class DataArrayImageView(pg.ImageView):
             bottom = data_array.dims[0],
             left = data_array.dims[1]
         )
-        self._set_axis_coords(data_array)
-        self.setImage(image)
+        pos, scale = self._set_axis_coords(data_array)
+        self.setImage(image, pos=pos, scale=scale)
 
     # ------------------------------------------------------------------------------
 
@@ -85,19 +85,19 @@ class DataArrayImageView(pg.ImageView):
         def _set_rect_values(values: list):
             if type(values[0]) == str or not _is_monotonic(values):
                 start = 0
-                length = len(values)
+                scale = 1
             else:
                 start = values[0]
-                length = values[-1] - values[0]
-            return start, length
+                scale = values[1] - values[0]
+            return start, scale
         
         x_values = data_array.coords[data_array.dims[0]].values
         y_values = data_array.coords[data_array.dims[1]].values
 
-        x, width = _set_rect_values(x_values)
-        y, height = _set_rect_values(y_values)
+        x, x_scale = _set_rect_values(x_values)
+        y, y_scale = _set_rect_values(y_values)
 
-        self.imageItem.setOpts(rect=(x, y, width, height))
+        return (x, y), (x_scale, y_scale)
 
 # ----------------------------------------------------------------------------------
 
