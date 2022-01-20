@@ -31,7 +31,7 @@ class DataArrayImageView(pg.ImageView):
         super(DataArrayImageView, self).__init__(
             parent, 
             view=pg.PlotItem(),
-            image=pg.ImageItem()
+            imageItem=pg.ImageItem()
         )
 
         self.ui.histogram.hide()
