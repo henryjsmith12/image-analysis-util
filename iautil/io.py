@@ -227,12 +227,3 @@ def _load_vti(file: str) -> Tuple[np.ndarray, List[list]]:
     return data, axes
 
 # ----------------------------------------------------------------------------------
-
-"""create_iau_file(
-    data_source="./examples/example_files",
-    iau_file_path="./examples/example_files/scans.iau",
-    axis_labels=["H", "K", "L", "V"],
-    metadata={"name": "scans"}
-)"""
-
-#load_iau_file("./examples/example_files/scans.iau")
