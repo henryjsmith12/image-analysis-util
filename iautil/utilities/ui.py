@@ -30,7 +30,8 @@ class DataArrayImageView(pg.ImageView):
     def __init__(self, parent=None) -> None:
         super(DataArrayImageView, self).__init__(
             parent, 
-            view=pg.PlotItem()
+            view=pg.PlotItem(),
+            image=pg.ImageItem()
         )
 
         self.ui.histogram.hide()
@@ -77,14 +78,26 @@ class DataArrayImageView(pg.ImageView):
         
         """
 
-        x_axis = map(str, data_array.coords[data_array.dims[0]].values)
-        y_axis = map(str, data_array.coords[data_array.dims[1]].values)
+        def _is_monotonic(values: list):
+            dx = np.diff(values)
+            return np.all(dx <= 0) or np.all(dx >= 0)
 
-        ...
+        def _set_rect_values(values: list):
+            if type(values[0]) == str or not _is_monotonic(values):
+                start = 0
+                length = len(values)
+            else:
+                start = values[0]
+                length = values[-1] - values[0]
+            return start, length
+        
+        x_values = data_array.coords[data_array.dims[0]].values
+        y_values = data_array.coords[data_array.dims[1]].values
 
-    # ------------------------------------------------------------------------------
+        x, width = _set_rect_values(x_values)
+        y, height = _set_rect_values(y_values)
 
-    
+        self.imageItem.setOpts(rect=(x, y, width, height))
 
 # ----------------------------------------------------------------------------------
 
