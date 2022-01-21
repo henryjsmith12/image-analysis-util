@@ -7,7 +7,7 @@ A general tool for plotting, slicing, and analyzing xarray DataArrays.
 #from iautil.utilities.ui import DataArrayImageView
 import numpy as np
 import pyqtgraph as pg
-from pyqtgraph import dockarea, QtGui, QtCore
+from pyqtgraph import dockarea, QtGui
 import sys
 import xarray as xr
 
@@ -22,7 +22,7 @@ __all__ = (
 
 class ImageTool:
     """
-    
+    Creates an instance of a QApplication and displays an ImageToolWidget object.
     """
 
     app = pg.mkQApp("ImageTool")
