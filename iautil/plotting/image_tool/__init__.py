@@ -54,7 +54,7 @@ class ImageToolWidget(QtGui.QWidget):
 
         # Subwidgets
         self.data_array_image_view = None
-        self.controller_widget = None
+        self.data_array_controller = None
 
         # Docks
         self.dock_area = dockarea.DockArea()
@@ -74,19 +74,23 @@ class ImageToolWidget(QtGui.QWidget):
 
     def _create_widgets(self) -> None:
         """
-        
+        Instantiates widgets for ImageTool
+
+        DataArrayImageView - Custom PyQtGraph ImageView widget
+        DataArrayController - Controls slice direction and position
         """
+
         from iautil.plotting.image_tool.controller import DataArrayController
         from iautil.utilities.ui import DataArrayImageView
         
         self.data_array_image_view = DataArrayImageView()
-        self.controller_widget = DataArrayController(self.data_array, self)
+        self.data_array_controller = DataArrayController(self.data_array, self)
         
     # ------------------------------------------------------------------------------
     
     def _create_docks(self) -> None:
         """
-        
+        Creates resizeable docks for each widget.
         """
 
         self.data_array_image_view_dock = dockarea.Dock(
@@ -97,9 +101,9 @@ class ImageToolWidget(QtGui.QWidget):
         )
 
         self.controller_widget_dock = dockarea.Dock(
-            name="Controller",
+            name="DataArray Controller",
             size=(200, 100),
-            widget=self.controller_widget,
+            widget=self.data_array_controller,
             hideTitle=True
         )
 
