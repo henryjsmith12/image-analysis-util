@@ -30,7 +30,13 @@ class ImageTool:
     def __init__(self, data_array: xr.DataArray) -> None:
         self.image_tool_widget = ImageToolWidget(data_array)
 
-    def show(self):
+    # ------------------------------------------------------------------------------
+
+    def show(self) -> None:
+        """
+        Displays ImageTool and executes app.
+        """
+
         self.image_tool_widget.show()
         self.app.exec_()
 
@@ -38,7 +44,7 @@ class ImageTool:
 
 class ImageToolWidget(QtGui.QWidget):
     """
-
+    ImageTool window and widget.
     """
 
     def __init__(self, data_array: xr.DataArray) -> None:
@@ -46,16 +52,20 @@ class ImageToolWidget(QtGui.QWidget):
 
         self.data_array = data_array
 
+        # Subwidgets
         self.data_array_image_view = None
         self.controller_widget = None
 
+        # Docks
         self.dock_area = dockarea.DockArea()
         self.data_array_image_view_dock = None
         self.controller_widget_dock = None
         
+        # Creation functions
         self._create_widgets()
         self._create_docks()
 
+        # Layout
         self.layout = QtGui.QVBoxLayout()
         self.layout.addWidget(self.dock_area)
         self.setLayout(self.layout)
