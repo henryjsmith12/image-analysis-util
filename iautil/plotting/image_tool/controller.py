@@ -175,21 +175,29 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
             dim_lbl = data_array.dims[i]
             dim_coords = map(str, data_array.coords[dim_lbl].values)
 
+            # Adds new component to respective list
             self.lbl_list.append(QtGui.QLabel(dim_lbl))
             self.axis_cbx_list.append(QtGui.QComboBox())
             self.value_slider_list.append(QtGui.QSlider(QtCore.Qt.Horizontal))
             self.value_cbx_list.append(QtGui.QComboBox())
 
+            # Adds axes and sets current axis
             self.axis_cbx_list[i].addItems(axes)
             self.axis_cbx_list[i].setCurrentIndex(i)
+
+            # Sets max value index 
             self.value_slider_list[i].setMaximum(data_array.shape[i] - 1)
+
+            # Adds values
             self.value_cbx_list[i].addItems(dim_coords)
 
+            # Adds components to layout
             self.addWidget(self.lbl_list[i], i, 0)
             self.addWidget(self.axis_cbx_list[i], i, 1)
             self.addWidget(self.value_slider_list[i], i, 2, 1, 3)
             self.addWidget(self.value_cbx_list[i], i, 5)
 
+            # Connections
             self.axis_cbx_list[i].currentIndexChanged.connect(
                 parent._update_axes
             )
