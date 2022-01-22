@@ -1,5 +1,5 @@
 """
-Widget that controls the DataArray loaded into an ImageTool instance.
+Controls DataArray slice in ImageView.
 """
 
 # ----------------------------------------------------------------------------------
@@ -11,19 +11,13 @@ import xarray as xr
 
 # ----------------------------------------------------------------------------------
 
-__all__ = (
-    "DataArrayController"
-)
-
-# ----------------------------------------------------------------------------------
-
-AXES = ["x", "y", "z", "t"]
+AXES = ["x", "y", "z1", "z2"]
 
 # ----------------------------------------------------------------------------------
 
 class DataArrayController(QtGui.QWidget):
     """
-    Controller for the ImageTool DataArray.
+    Controls DataArray slice in ImageView.
     """
 
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
@@ -32,33 +26,35 @@ class DataArrayController(QtGui.QWidget):
         self.parent = parent
         self.data_array = data_array
         
+        # Custom layout
         self.layout = DataArrayControllerLayout(data_array, parent=self)
         self.setLayout(self.layout)
 
-        self.dim_lbl_list = self.layout.dim_lbl_list
-        self.dim_axis_cbx_list = self.layout.dim_axis_cbx_list
-        self.dim_slider_list = self.layout.dim_slider_list
-        self.dim_currval_cbx_list = self.layout.dim_currval_cbx_list
+        # Component lists from layout
+        self.lbl_list = self.layout.lbl_list
+        self.axis_cbx_list = self.layout.axis_cbx_list
+        self.value_slider_list = self.layout.value_slider_list
+        self.value_cbx_list = self.layout.value_cbx_list
 
-        self._update_currval()
+        self._update_value()
         self._update_axes()
 
     # ------------------------------------------------------------------------------
 
-    def _update_currval(self) -> None:
+    def _update_value(self) -> None:
         """
-        
+        Updates value for axis when changed by a slider or combobox.
         """
         
         if isinstance(self.sender(), QtGui.QSlider):
-            dim = self.dim_slider_list.index(self.sender())
-            currval_index = self.sender().value()
-            self.dim_currval_cbx_list[dim].setCurrentIndex(currval_index)
+            dim = self.value_slider_list.index(self.sender())
+            value_index = self.sender().value()
+            self.value_cbx_list[dim].setCurrentIndex(value_index)
 
         if isinstance(self.sender(), QtGui.QComboBox):
-            dim = self.dim_currval_cbx_list.index(self.sender())
-            currval_index = self.sender().currentIndex()
-            self.dim_slider_list[dim].setValue(currval_index)
+            dim = self.value_cbx_list.index(self.sender())
+            value_index = self.sender().currentIndex()
+            self.value_slider_list[dim].setValue(value_index)
 
         self._update_image_view()
 
@@ -66,32 +62,42 @@ class DataArrayController(QtGui.QWidget):
 
     def _update_axes(self) -> None:
         """
-        
+        Updates axis order to determine which slice is in view
         """
 
+        # After initial update (after controller is created)
         if not self.sender() is None:
+            # Changed axis
             new_axis = self.sender().currentIndex()
+
+            # All axes
             axes = [i for i in range(self.data_array.ndim)]
-            curr_axes = [cbx.currentIndex() for cbx in self.dim_axis_cbx_list]
+
+            # Axes after initial change
+            curr_axes = [cbx.currentIndex() for cbx in self.axis_cbx_list]
             
+            # Axis that is not in curr_axes
             try:
                 axis_to_add = list(set(axes) - set(curr_axes))[0]
             except:
                 pass
 
+        # Loops through axes
         for i in range(self.data_array.ndim):
-            cbx = self.dim_axis_cbx_list[i]
+            cbx = self.axis_cbx_list[i]
 
+            # After initial update (after controller is created)
             if not self.sender() is None:
                 if cbx.currentIndex() == new_axis and not cbx == self.sender():
                     cbx.setCurrentIndex(axis_to_add)
 
+            # Enables/disables value-changing components based on axis
             if cbx.currentIndex() <= 1:
-                self.dim_slider_list[i].setEnabled(False)
-                self.dim_currval_cbx_list[i].setEnabled(False)
+                self.value_slider_list[i].setEnabled(False)
+                self.value_cbx_list[i].setEnabled(False)
             else:
-                self.dim_slider_list[i].setEnabled(True)
-                self.dim_currval_cbx_list[i].setEnabled(True)
+                self.value_slider_list[i].setEnabled(True)
+                self.value_cbx_list[i].setEnabled(True)
 
         self._update_image_view()
 
@@ -99,34 +105,47 @@ class DataArrayController(QtGui.QWidget):
 
     def _update_image_view(self) -> None:
         """
-        
+        Determines slice to display in ImageView.
         """
 
-        image_view_image = None
         str_numpy_args = ""
         transpose = False
         x_index, y_index = 0, 0
 
+        # Loops through axes
         for i in range(self.data_array.ndim):
-            if self.dim_slider_list[i].isEnabled():
-                str_numpy_args += f"{self.dim_slider_list[i].value()}"
+
+            # Checks is axis is enabled (not x or y)
+            if self.value_slider_list[i].isEnabled():
+                # Adds value index to string for NumPy args
+                str_numpy_args += f"{self.value_slider_list[i].value()}"
             else:
                 str_numpy_args += ":"
-                if self.dim_axis_cbx_list[i].currentIndex() == 0:
+
+                # Checks for conditions to transpose
+                if self.axis_cbx_list[i].currentIndex() == 0:
                     x_index = i
                 else:
                     y_index = i
 
+            # Adds commas in between args
             if i < self.data_array.ndim - 1:
                 str_numpy_args += ","
 
+        # Transposes image if y occurs before x
         if y_index < x_index:
             transpose = True
         
+        # Converts a string into numpy arguments
         numpy_args = eval(f'np.s_[{str_numpy_args}]')
+
+        # DataArray slice
         data_array_slice = self.data_array[numpy_args]
 
+        # Checks for empty slice
         if data_array_slice.values.ndim != 0:
+
+            # Checks for transpose
             if not transpose:
                 self.parent.data_array_image_view.set_data_array(data_array_slice)
             else:
@@ -136,44 +155,43 @@ class DataArrayController(QtGui.QWidget):
 
 class DataArrayControllerLayout(QtGui.QGridLayout):
     """
-    
     """
 
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
         super(DataArrayControllerLayout, self).__init__(parent)
 
-        self.dim_lbl_list = []
-        self.dim_axis_cbx_list = []
-        self.dim_slider_list = []
-        self.dim_currval_cbx_list = []
+        self.lbl_list = []
+        self.axis_cbx_list = []
+        self.value_slider_list = []
+        self.value_cbx_list = []
         axes = AXES[:data_array.ndim]
 
         for i in range(data_array.ndim):
             dim_lbl = data_array.dims[i]
             dim_coords = map(str, data_array.coords[dim_lbl].values)
 
-            self.dim_lbl_list.append(QtGui.QLabel(dim_lbl))
-            self.dim_axis_cbx_list.append(QtGui.QComboBox())
-            self.dim_slider_list.append(QtGui.QSlider(QtCore.Qt.Horizontal))
-            self.dim_currval_cbx_list.append(QtGui.QComboBox())
+            self.lbl_list.append(QtGui.QLabel(dim_lbl))
+            self.axis_cbx_list.append(QtGui.QComboBox())
+            self.value_slider_list.append(QtGui.QSlider(QtCore.Qt.Horizontal))
+            self.value_cbx_list.append(QtGui.QComboBox())
 
-            self.dim_axis_cbx_list[i].addItems(axes)
-            self.dim_axis_cbx_list[i].setCurrentIndex(i)
-            self.dim_slider_list[i].setMaximum(data_array.shape[i] - 1)
-            self.dim_currval_cbx_list[i].addItems(dim_coords)
+            self.axis_cbx_list[i].addItems(axes)
+            self.axis_cbx_list[i].setCurrentIndex(i)
+            self.value_slider_list[i].setMaximum(data_array.shape[i] - 1)
+            self.value_cbx_list[i].addItems(dim_coords)
 
-            self.addWidget(self.dim_lbl_list[i], i, 0)
-            self.addWidget(self.dim_axis_cbx_list[i], i, 1)
-            self.addWidget(self.dim_slider_list[i], i, 2, 1, 3)
-            self.addWidget(self.dim_currval_cbx_list[i], i, 5)
+            self.addWidget(self.lbl_list[i], i, 0)
+            self.addWidget(self.axis_cbx_list[i], i, 1)
+            self.addWidget(self.value_slider_list[i], i, 2, 1, 3)
+            self.addWidget(self.value_cbx_list[i], i, 5)
 
-            self.dim_axis_cbx_list[i].currentIndexChanged.connect(
+            self.axis_cbx_list[i].currentIndexChanged.connect(
                 parent._update_axes
             )
-            self.dim_slider_list[i].valueChanged.connect(
+            self.value_slider_list[i].valueChanged.connect(
                 parent._update_currval
             )
-            self.dim_currval_cbx_list[i].currentIndexChanged.connect(
+            self.value_cbx_list[i].currentIndexChanged.connect(
                 parent._update_currval
             )
 
