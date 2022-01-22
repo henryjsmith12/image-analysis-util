@@ -155,17 +155,22 @@ class DataArrayController(QtGui.QWidget):
 
 class DataArrayControllerLayout(QtGui.QGridLayout):
     """
+    Custom dynamic grid layout for controller
     """
 
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
         super(DataArrayControllerLayout, self).__init__(parent)
 
+        # Lists for components
         self.lbl_list = []
         self.axis_cbx_list = []
         self.value_slider_list = []
         self.value_cbx_list = []
+
+        # Axis labels (depends on number of dimensions in DataArray)
         axes = AXES[:data_array.ndim]
 
+        # Loops through axes
         for i in range(data_array.ndim):
             dim_lbl = data_array.dims[i]
             dim_coords = map(str, data_array.coords[dim_lbl].values)
