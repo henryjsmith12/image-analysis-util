@@ -202,10 +202,10 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
                 parent._update_axes
             )
             self.value_slider_list[i].valueChanged.connect(
-                parent._update_currval
+                parent._update_value
             )
             self.value_cbx_list[i].currentIndexChanged.connect(
-                parent._update_currval
+                parent._update_value
             )
 
 # ----------------------------------------------------------------------------------

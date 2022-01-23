@@ -99,9 +99,7 @@ class DataArrayImageView(pg.ImageView):
 
     # ------------------------------------------------------------------------------
 
-    def _get_axis_coords(
-        self, data_array: xr.DataArray
-    ) -> Tuple(Tuple(float, float), Tuple(float, float)):
+    def _get_axis_coords(self, data_array: xr.DataArray):
         """
         Retrieves axis starting points and scaling for image.
 
