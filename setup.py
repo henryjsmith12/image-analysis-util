@@ -15,6 +15,7 @@ setup(
     version="0.1.0",
     description="Scientific image exploration software for multidimensional datasets.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Henry Smith",
     author_email="smithh@anl.gov",
     url="https://github.com/henryjsmith12/image-analysis-util/iautil",
