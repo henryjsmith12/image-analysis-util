@@ -173,7 +173,12 @@ class DataArrayControllerLayout(QtGui.QGridLayout):
         # Loops through axes
         for i in range(data_array.ndim):
             dim_lbl = data_array.dims[i]
-            dim_coords = map(str, data_array.coords[dim_lbl].values)
+
+            # Rounds numeric labels and converts them to strings
+            raw_coords = data_array.coords[dim_lbl].values
+            if not type(raw_coords[0]) == str:
+                raw_coords = [round(i, 5) for i in raw_coords]
+            dim_coords = list(map(str, raw_coords))
 
             # Adds new component to respective list
             self.lbl_list.append(QtGui.QLabel(dim_lbl))
