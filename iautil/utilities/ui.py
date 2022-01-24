@@ -4,7 +4,6 @@ Contains overridden UI widget classes from PyQtGraph.
 
 # ----------------------------------------------------------------------------------
 
-from typing import Tuple
 from matplotlib import colors
 from matplotlib import pyplot as plt
 import numpy as np
