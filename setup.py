@@ -1,10 +1,12 @@
-"""
+# ----------------------------------------------------------------------------------
 
-"""
+from pathlib import Path
+from setuptools import setup, find_packages
 
 # ----------------------------------------------------------------------------------
 
-from setuptools import setup, find_packages
+this_dir = Path(__file__).parent
+long_description = (this_dir / "README.md").read_text()
 
 # ----------------------------------------------------------------------------------
 
@@ -12,6 +14,7 @@ setup(
     name="image-analysis-util",
     version="0.1.0",
     description="Scientific image exploration software for multidimensional datasets.",
+    long_description=long_description,
     author="Henry Smith",
     author_email="smithh@anl.gov",
     url="https://github.com/henryjsmith12/image-analysis-util/iautil",
