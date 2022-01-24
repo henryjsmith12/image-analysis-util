@@ -2,15 +2,18 @@
 
 Copyright (c) UChicago Argonne, LLC. All rights reserved.
 
-Scientific image exploration software for 3D and 4D datasets. A continuation of the Image_Analysis repository.
+Scientific image exploration software for 2D, 3D, and 4D datasets. A continuation of the Image_Analysis repository. 
 
 ## About
 
+The image-analysis-util repository focuses on providing tools for users to explore and analyze their datasets.
+
 ### Built With
 
-* [`PyQt5`](https://pypi.org/project/PyQt5/)
-* [`pyqtgraph`](https://pypi.org/project/pyqtgraph/)
-* [`h5py`](https://pypi.org/project/h5py/)
+* [`h5py`](https://docs.h5py.org/en/stable/)
+* [`PyQt5`](https://doc.qt.io/qtforpython/)
+* [`pyqtgraph`](https://pyqtgraph.readthedocs.io/en/latest/)
+* [`xarray`](https://xarray.pydata.org/en/stable/)
 
 ## Getting Started
 
@@ -33,7 +36,7 @@ pip install image-analysis-util
 
    ```
    git clone https://github.com/henryjsmith12/image-analysis-util.git
-   ```
+   ``` 
 2. Create an Anaconda virtual environment using `environment.yml`. The environment name can be altered in that file. By default, the virtual environment is named `ia-util-venv`.
 
    ```
@@ -45,13 +48,9 @@ pip install image-analysis-util
    conda activate ia-util-venv
    ```
 
-## Usage
+## Screenshots
 
 ## Roadmap
-
-* [X] .iau file creation and loading functions
-* [X] PyPI installation option
-* [ ] Basic Image Tool
 
 ## License
 
