@@ -2,7 +2,7 @@
 
 Copyright (c) UChicago Argonne, LLC. All rights reserved.
 
-Scientific image exploration software for 2D, 3D, and 4D datasets. A continuation of the Image_Analysis repository. 
+Scientific image exploration software for 2D, 3D, and 4D datasets. A continuation of the Image_Analysis repository.
 
 ## About
 
@@ -36,7 +36,7 @@ pip install image-analysis-util
 
    ```
    git clone https://github.com/henryjsmith12/image-analysis-util.git
-   ``` 
+   ```
 2. Create an Anaconda virtual environment using `environment.yml`. The environment name can be altered in that file. By default, the virtual environment is named `ia-util-venv`.
 
    ```
@@ -54,6 +54,9 @@ pip install image-analysis-util
 <img src="https://github.com/henryjsmith12/image-analysis-util/blob/main/examples/screenshots/image_tool_4D.png" width="500"/>
 
 ## Roadmap
+
+* [ ] Slicing/linecut tab
+* [ ] ROI tab
 
 ## License
 
