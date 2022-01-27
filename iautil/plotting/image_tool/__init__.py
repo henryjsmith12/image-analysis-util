@@ -48,7 +48,8 @@ class ImageToolWidget(QtGui.QWidget):
     def __init__(self, data_array: xr.DataArray) -> None:
         super(ImageToolWidget, self).__init__()
 
-        self.setMinimumSize(640, 480)
+        self.setWindowTitle("ImageTool")
+        self.setMinimumSize(900, 675)
 
         self.data_array = data_array
 
