@@ -34,6 +34,9 @@ class DataArrayImageView(pg.ImageView):
             imageItem=pg.ImageItem()
         )
 
+        self.roi = None
+        self.line_roi = None
+
         # Removes out default ImageView features
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
