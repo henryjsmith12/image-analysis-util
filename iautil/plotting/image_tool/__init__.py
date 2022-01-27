@@ -107,7 +107,28 @@ class ImageToolWidget(QtGui.QWidget):
             hideTitle=True
         )
 
-        self.dock_area.addDock(self.data_array_image_view_dock)
-        self.dock_area.addDock(self.controller_widget_dock)
+        self.slicing_widget_dock = dockarea.Dock(
+            name="Slicing",
+            size=(200, 300),
+            widget=None,
+            hideTitle=False
+        )
+
+        self.dock_area.addDock(self.slicing_widget_dock)
+        self.dock_area.addDock(self.data_array_image_view_dock, "left", self.slicing_widget_dock)
+        self.dock_area.addDock(self.controller_widget_dock, "left", self.slicing_widget_dock)
+        self.dock_area.moveDock(self.controller_widget_dock, "bottom", 
+            self.data_array_image_view_dock)
 
 # ----------------------------------------------------------------------------------
+
+it = ImageTool(
+    xr.DataArray(
+        [
+            [1, 2, 3, 4],
+            [4, 5, 6, 7]
+        ]
+    )
+)
+
+it.show()
