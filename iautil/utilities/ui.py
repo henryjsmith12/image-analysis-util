@@ -34,9 +34,6 @@ class DataArrayImageView(pg.ImageView):
             imageItem=pg.ImageItem()
         )
 
-        self.roi = None
-        self.line_roi = None
-
         # Removes out default ImageView features
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
@@ -58,6 +55,7 @@ class DataArrayImageView(pg.ImageView):
 
         # Adds matplotlib colormap to image
         image = self._set_color_map(data_array.values)
+        image_item = pg.ImageItem(image)
 
         # Sets plot labels
         self.view.setLabels(
@@ -158,3 +156,19 @@ class DataArrayPlot(pg.PlotWidget):
         super(DataArrayPlot, self).__init__(parent, plotItem)
 
 # ----------------------------------------------------------------------------------
+
+class LineROI(pg.LineSegmentROI):
+    """
+    
+    """
+
+    def __init__(self) -> None:
+        super(LineROI, self).__init__()
+
+    # ------------------------------------------------------------------------------
+
+    def get_data_array_slice(data, image_item):
+        ...
+
+# ----------------------------------------------------------------------------------
+
