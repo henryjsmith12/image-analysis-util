@@ -30,7 +30,7 @@ class SlicingWidget(QtGui.QWidget):
 
 # ----------------------------------------------------------------------------------
 
-class SlicingWidgetLayout(QtGui.QVBoxLayout):
+class SlicingWidgetLayout(QtGui.QGridLayout):
     """
     Custom dynamic grid layout for slicing widget.
 
@@ -50,37 +50,37 @@ class SlicingWidgetLayout(QtGui.QVBoxLayout):
             self.groupbx_4d = QtGui.QGroupBox("4D to 3D")
             self.groupbx_4d.setCheckable(True)
             self.image_view_4d = DataArrayImageView()
-            self.line_roi_4d = pg.LineSegmentROI()
-            self.center_btn_4d = QtGui.QPushButton("Center Line ROI")
-
+            self.line_roi_4d = pg.LineSegmentROI(positions=(0, 0))
+            self.image_view_4d.addItem(self.line_roi_4d)
+            
             self.layout_4d = QtGui.QGridLayout()
             self.groupbx_4d.setLayout(self.layout_4d)
             self.layout_4d.addWidget(self.image_view_4d, 0, 0, 4, 6)
-            self.layout_4d.addWidget(self.center_btn_4d, 4, 3, 1, 3)
-
+            
             self.addWidget(self.groupbx_4d)
+            self.setRowStretch(2, 1)
 
         if data_array.ndim >= 3:
             # 2D ImageView
             self.groupbx_3d = QtGui.QGroupBox("3D to 2D")
             self.groupbx_3d.setCheckable(True)
             self.image_view_3d = DataArrayImageView()
-            self.line_roi_3d = pg.LineSegmentROI()
-            self.center_btn_3d = QtGui.QPushButton("Center Line ROI")
-
+            self.line_roi_3d = pg.LineSegmentROI(positions=(0, 0))
+            self.image_view_3d.addItem(self.line_roi_3d)
+            
             self.layout_3d = QtGui.QGridLayout()
             self.groupbx_3d.setLayout(self.layout_3d)
             self.layout_3d.addWidget(self.image_view_3d, 0, 0, 4, 6)
-            self.layout_3d.addWidget(self.center_btn_3d, 4, 3, 1, 3)
-
+            
             self.addWidget(self.groupbx_3d)
+            self.setRowStretch(1, 1)
 
         if data_array.ndim >= 2:
             # 1D Plot
             self.groupbx_2d = QtGui.QGroupBox("2D to 1D")
             self.groupbx_2d.setCheckable(True)
             self.plot_2d = DataArrayPlot()
-            self.line_roi_2d = pg.LineSegmentROI()
+            self.plot_2d.setBackground('default')
             self.center_btn_2d = QtGui.QPushButton("Center Line ROI")
 
             self.layout_2d = QtGui.QGridLayout()
@@ -88,20 +88,28 @@ class SlicingWidgetLayout(QtGui.QVBoxLayout):
             self.layout_2d.addWidget(self.plot_2d, 0, 0, 4, 6)
 
             self.addWidget(self.groupbx_2d)
+            self.setRowStretch(0, 1)
 
 # ----------------------------------------------------------------------------------
-
+"""
 app = pg.mkQApp()
 slc = SlicingWidget(
     xr.DataArray(
+        [[[[1,2,3],
+        [1,2,3],
+        [1,2,3]],
+        [[1,2,3],
+        [1,2,3],
+        [1,2,3]]],
         [[[1,2,3],
         [1,2,3],
         [1,2,3]],
         [[1,2,3],
         [1,2,3],
-        [1,2,3]]]
+        [1,2,3]]]]
     )
 )
 
 slc.show()
 app.exec_()
+"""
