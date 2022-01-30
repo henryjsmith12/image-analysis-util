@@ -47,11 +47,10 @@ class SlicingWidgetLayout(QtGui.QVBoxLayout):
 
         if data_array.ndim >= 4:
             # 3D ImageView with slider
-            # "Center ROI" button
-            # "Change Color" button
             self.groupbx_4d = QtGui.QGroupBox("4D to 3D")
             self.groupbx_4d.setCheckable(True)
             self.image_view_4d = DataArrayImageView()
+            self.line_roi_4d = pg.LineSegmentROI()
             self.center_btn_4d = QtGui.QPushButton("Center Line ROI")
 
             self.layout_4d = QtGui.QGridLayout()
@@ -66,6 +65,7 @@ class SlicingWidgetLayout(QtGui.QVBoxLayout):
             self.groupbx_3d = QtGui.QGroupBox("3D to 2D")
             self.groupbx_3d.setCheckable(True)
             self.image_view_3d = DataArrayImageView()
+            self.line_roi_3d = pg.LineSegmentROI()
             self.center_btn_3d = QtGui.QPushButton("Center Line ROI")
 
             self.layout_3d = QtGui.QGridLayout()
@@ -80,6 +80,7 @@ class SlicingWidgetLayout(QtGui.QVBoxLayout):
             self.groupbx_2d = QtGui.QGroupBox("2D to 1D")
             self.groupbx_2d.setCheckable(True)
             self.plot_2d = DataArrayPlot()
+            self.line_roi_2d = pg.LineSegmentROI()
             self.center_btn_2d = QtGui.QPushButton("Center Line ROI")
 
             self.layout_2d = QtGui.QGridLayout()
