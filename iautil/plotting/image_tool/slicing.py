@@ -23,6 +23,7 @@ class SlicingWidget(QtGui.QWidget):
 
         self.parent = parent
         self.data_array = data_array
+        self.main_image_view = parent.data_array_image_view
         
         # Custom layout
         self.layout = SlicingWidgetLayout(data_array, parent=self)
@@ -45,13 +46,18 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
         super(SlicingWidgetLayout, self).__init__(parent)
 
+        self.main_image_view = parent.main_image_view
+        self.image_view_4d, self.line_roi_4d = None, None
+        self.image_view_3d, self.line_roi_3d = None, None
+        self.plot_2d, self.line_roi_2d = None, None
+
         if data_array.ndim >= 4:
             # 3D ImageView with slider
             self.groupbx_4d = QtGui.QGroupBox("4D to 3D")
             self.groupbx_4d.setCheckable(True)
             self.image_view_4d = DataArrayImageView()
             self.line_roi_4d = pg.LineSegmentROI(positions=(0, 0))
-            self.image_view_4d.addItem(self.line_roi_4d)
+            self.main_image_view.addItem(self.line_roi_4d)
             
             self.layout_4d = QtGui.QGridLayout()
             self.groupbx_4d.setLayout(self.layout_4d)
@@ -66,7 +72,10 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.groupbx_3d.setCheckable(True)
             self.image_view_3d = DataArrayImageView()
             self.line_roi_3d = pg.LineSegmentROI(positions=(0, 0))
-            self.image_view_3d.addItem(self.line_roi_3d)
+            if data_array.ndim > 3:
+                self.image_view_4d.addItem(self.line_roi_3d)
+            else:
+                self.main_image_view.addItem(self.line_roi_3d)
             
             self.layout_3d = QtGui.QGridLayout()
             self.groupbx_3d.setLayout(self.layout_3d)
@@ -81,7 +90,11 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.groupbx_2d.setCheckable(True)
             self.plot_2d = DataArrayPlot()
             self.plot_2d.setBackground('default')
-            self.center_btn_2d = QtGui.QPushButton("Center Line ROI")
+            self.line_roi_2d = pg.LineSegmentROI(positions=(0, 0))
+            if data_array.ndim > 2:
+                self.image_view_3d.addItem(self.line_roi_2d)
+            else:
+                self.main_image_view.addItem(self.line_roi_2d)
 
             self.layout_2d = QtGui.QGridLayout()
             self.groupbx_2d.setLayout(self.layout_2d)
