@@ -147,9 +147,13 @@ class DataArrayController(QtGui.QWidget):
 
             # Checks for transpose
             if not transpose:
-                self.parent.data_array_image_view.set_data_array(data_array_slice)
+                self.parent.data_array_image_view.set_data_array_slice(
+                    data_array_slice
+                )
             else:
-                self.parent.data_array_image_view.set_data_array(data_array_slice.T)
+                self.parent.data_array_image_view.set_data_array_slice(
+                    data_array_slice.T
+                )
         
 # ----------------------------------------------------------------------------------
 
