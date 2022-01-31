@@ -34,6 +34,10 @@ class DataArrayImageView(pg.ImageView):
             imageItem=pg.ImageItem()
         )
 
+        self.data_array = None
+        self.data_array_slice = None
+        self.image_item = None
+
         # Removes out default ImageView features
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
@@ -47,6 +51,14 @@ class DataArrayImageView(pg.ImageView):
 
     def set_data_array(self, data_array: xr.DataArray) -> None:
         """
+        
+        """
+        self.data_array = data_array
+
+    # ------------------------------------------------------------------------------
+
+    def set_data_array_slice(self, data_array: xr.DataArray) -> None:
+        """
         Sets image, axis labels, axis coordinates for ImageView.
 
         Parameters:
@@ -54,8 +66,8 @@ class DataArrayImageView(pg.ImageView):
         """
 
         # Adds matplotlib colormap to image
-        image = self._set_color_map(data_array.values)
-        image_item = pg.ImageItem(image)
+        self.data_array_slice = self._set_color_map(data_array.values)
+        self.image_item = pg.ImageItem(self.data_array_slice)
 
         # Sets plot labels
         self.view.setLabels(
@@ -67,7 +79,7 @@ class DataArrayImageView(pg.ImageView):
         pos, scale = self._get_axis_coords(data_array)
 
         # Adds image to ImageView with proper axes
-        self.setImage(image, pos=pos, scale=scale)
+        self.setImage(self.data_array_slice, pos=pos, scale=scale)
 
     # ------------------------------------------------------------------------------
 
@@ -157,18 +169,33 @@ class DataArrayPlot(pg.PlotWidget):
 
 # ----------------------------------------------------------------------------------
 
-class LineROI(pg.LineSegmentROI):
+class SlicingROI(pg.LineSegmentROI):
     """
     
     """
 
-    def __init__(self) -> None:
-        super(LineROI, self).__init__()
+    def __init__(self, position=(0,0), parent=None, child=None) -> None:
+        super(SlicingROI, self).__init__(position)
+
+        self.parent = parent
+        self.child = child
+
+        self.parent.addItem(self)
+
+        self.sigRegionChanged.connect(self.slice_data_array)
 
     # ------------------------------------------------------------------------------
 
-    def get_data_array_slice(data, image_item):
-        ...
+    def slice_data_array(self):
+        p_data_array = self.parent.data_array
+        p_data_array_slice = self.parent.data_array_slice
+        data, coords = self.getArrayRegion(
+            data=self.parent.data_array_slice,
+            img=self.parent.image_item,
+            returnMappedCoords=True
+        )
+        coords = coords.astype(int)
+        #print(f"DATA: {data}\nCOORDS: {coords}")
+        
 
-# ----------------------------------------------------------------------------------
 
