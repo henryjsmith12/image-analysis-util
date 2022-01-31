@@ -56,7 +56,7 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.groupbx_4d = QtGui.QGroupBox("4D to 3D")
             self.groupbx_4d.setCheckable(True)
             self.image_view_4d = DataArrayImageView()
-            self.line_roi_4d = pg.LineSegmentROI(positions=(0, 0))
+            self.line_roi_4d = pg.LineSegmentROI(positions=(0, 1))
             self.main_image_view.addItem(self.line_roi_4d)
             
             self.layout_4d = QtGui.QGridLayout()
@@ -71,7 +71,7 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.groupbx_3d = QtGui.QGroupBox("3D to 2D")
             self.groupbx_3d.setCheckable(True)
             self.image_view_3d = DataArrayImageView()
-            self.line_roi_3d = pg.LineSegmentROI(positions=(0, 0))
+            self.line_roi_3d = pg.LineSegmentROI(positions=(0, 1))
             if data_array.ndim > 3:
                 self.image_view_4d.addItem(self.line_roi_3d)
             else:
@@ -90,7 +90,7 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.groupbx_2d.setCheckable(True)
             self.plot_2d = DataArrayPlot()
             self.plot_2d.setBackground('default')
-            self.line_roi_2d = pg.LineSegmentROI(positions=(0, 0))
+            self.line_roi_2d = pg.LineSegmentROI(positions=(0, 1))
             if data_array.ndim > 2:
                 self.image_view_3d.addItem(self.line_roi_2d)
             else:
@@ -104,25 +104,3 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.setRowStretch(0, 1)
 
 # ----------------------------------------------------------------------------------
-"""
-app = pg.mkQApp()
-slc = SlicingWidget(
-    xr.DataArray(
-        [[[[1,2,3],
-        [1,2,3],
-        [1,2,3]],
-        [[1,2,3],
-        [1,2,3],
-        [1,2,3]]],
-        [[[1,2,3],
-        [1,2,3],
-        [1,2,3]],
-        [[1,2,3],
-        [1,2,3],
-        [1,2,3]]]]
-    )
-)
-
-slc.show()
-app.exec_()
-"""
