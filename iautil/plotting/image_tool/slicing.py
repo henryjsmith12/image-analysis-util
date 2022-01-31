@@ -9,7 +9,7 @@ import pyqtgraph as pg
 from PyQt5 import QtGui, QtCore
 import xarray as xr
 
-from iautil.utilities.ui import DataArrayImageView, DataArrayPlot
+from iautil.utilities.ui import DataArrayImageView, DataArrayPlot, SlicingROI
 
 # ----------------------------------------------------------------------------------
 
@@ -46,61 +46,72 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
         super(SlicingWidgetLayout, self).__init__(parent)
 
+        # ImageViews/Plot
         self.main_image_view = parent.main_image_view
-        self.image_view_4d, self.line_roi_4d = None, None
-        self.image_view_3d, self.line_roi_3d = None, None
-        self.plot_2d, self.line_roi_2d = None, None
+        self.image_view_3d = DataArrayImageView()
+        self.image_view_2d = DataArrayImageView()
+        self.plot_1d = DataArrayPlot()
+
+        # Slicing ROIs
+        self.slicing_roi_4d_3d = None
+        self.slicing_roi_3d_2d = None
+        self.slicing_roi_2d_1d = None
+
+        if data_array.ndim == 4:
+            self.slicing_roi_4d_3d = SlicingROI(
+                parent=self.main_image_view,
+                child=self.image_view_3d
+            )
+            self.slicing_roi_3d_2d = SlicingROI(
+                parent=self.image_view_3d, 
+                child=self.image_view_2d
+            )
+            self.slicing_roi_2d_1d = SlicingROI(
+                parent=self.image_view_2d, 
+                child=self.plot_1d
+            )
+        if data_array.ndim == 3:
+            self.slicing_roi_3d_2d = SlicingROI(
+                parent=self.main_image_view, 
+                child=self.image_view_2d
+            )
+            self.slicing_roi_2d_1d = SlicingROI(
+                parent=self.image_view_2d, 
+                child=self.plot_1d
+            )
+        if data_array.ndim == 2:
+            self.slicing_roi_2d_1d = SlicingROI(
+                parent=self.main_image_view,  
+                child=self.plot_1d
+            )
+
+        # Populates GroupBoxes
+        self.groupbox_3d, self.layout_3d = None, None
+        self.groupbox_2d, self.layout_2d = None, None
+        self.groupbox_1d, self.layout_1d = None, None
 
         if data_array.ndim >= 4:
-            # 3D ImageView with slider
-            self.groupbx_4d = QtGui.QGroupBox("4D to 3D")
-            self.groupbx_4d.setCheckable(True)
-            self.image_view_4d = DataArrayImageView()
-            self.line_roi_4d = pg.LineSegmentROI(positions=(0, 1))
-            self.main_image_view.addItem(self.line_roi_4d)
-            
-            self.layout_4d = QtGui.QGridLayout()
-            self.groupbx_4d.setLayout(self.layout_4d)
-            self.layout_4d.addWidget(self.image_view_4d, 0, 0, 4, 6)
-            
-            self.addWidget(self.groupbx_4d)
+            self.groupbx_3d = QtGui.QGroupBox("4D to 3D")
+            self.layout_3d = QtGui.QGridLayout()
+            self.groupbx_3d.setLayout(self.layout_3d)
+            self.layout_3d.addWidget(self.image_view_3d)
+            self.addWidget(self.groupbx_3d)
             self.setRowStretch(2, 1)
 
         if data_array.ndim >= 3:
-            # 2D ImageView
-            self.groupbx_3d = QtGui.QGroupBox("3D to 2D")
-            self.groupbx_3d.setCheckable(True)
-            self.image_view_3d = DataArrayImageView()
-            self.line_roi_3d = pg.LineSegmentROI(positions=(0, 1))
-            if data_array.ndim > 3:
-                self.image_view_4d.addItem(self.line_roi_3d)
-            else:
-                self.main_image_view.addItem(self.line_roi_3d)
-            
-            self.layout_3d = QtGui.QGridLayout()
-            self.groupbx_3d.setLayout(self.layout_3d)
-            self.layout_3d.addWidget(self.image_view_3d, 0, 0, 4, 6)
-            
-            self.addWidget(self.groupbx_3d)
+            self.groupbx_2d = QtGui.QGroupBox("3D to 2D")
+            self.layout_2d = QtGui.QGridLayout()
+            self.groupbx_2d.setLayout(self.layout_2d)
+            self.layout_2d.addWidget(self.image_view_2d)
+            self.addWidget(self.groupbx_2d)
             self.setRowStretch(1, 1)
 
         if data_array.ndim >= 2:
-            # 1D Plot
-            self.groupbx_2d = QtGui.QGroupBox("2D to 1D")
-            self.groupbx_2d.setCheckable(True)
-            self.plot_2d = DataArrayPlot()
-            self.plot_2d.setBackground('default')
-            self.line_roi_2d = pg.LineSegmentROI(positions=(0, 1))
-            if data_array.ndim > 2:
-                self.image_view_3d.addItem(self.line_roi_2d)
-            else:
-                self.main_image_view.addItem(self.line_roi_2d)
-
-            self.layout_2d = QtGui.QGridLayout()
-            self.groupbx_2d.setLayout(self.layout_2d)
-            self.layout_2d.addWidget(self.plot_2d, 0, 0, 4, 6)
-
-            self.addWidget(self.groupbx_2d)
+            self.groupbx_1d = QtGui.QGroupBox("2D to 1D")
+            self.layout_1d = QtGui.QGridLayout()
+            self.groupbx_1d.setLayout(self.layout_1d)
+            self.layout_1d.addWidget(self.plot_1d)
+            self.addWidget(self.groupbx_1d)
             self.setRowStretch(0, 1)
 
 # ----------------------------------------------------------------------------------
