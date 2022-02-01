@@ -13,6 +13,13 @@ import xarray as xr
 
 AXES = ["x", "y", "z", "t"]
 
+AXES_DICT = {
+    "x" : 0,
+    "y" : 1,
+    "z" : 2,
+    "t" : 3
+}
+
 # ----------------------------------------------------------------------------------
 
 class DataArrayController(QtGui.QWidget):
@@ -109,11 +116,16 @@ class DataArrayController(QtGui.QWidget):
         """
 
         str_numpy_args = ""
+        axis_order = []
         transpose = False
         x_index, y_index = 0, 0
 
         # Loops through axes
         for i in range(self.data_array.ndim):
+            
+            axis_order.append(
+                self.data_array.dims[AXES_DICT[self.axis_cbx_list[i].currentText()]]
+            )
 
             # Checks is axis is enabled (not x or y)
             if self.value_slider_list[i].isEnabled():
@@ -132,6 +144,8 @@ class DataArrayController(QtGui.QWidget):
             if i < self.data_array.ndim - 1:
                 str_numpy_args += ","
 
+        axis_order = tuple(axis_order)
+        
         # Transposes image if y occurs before x
         if y_index < x_index:
             transpose = True
@@ -148,11 +162,15 @@ class DataArrayController(QtGui.QWidget):
             # Checks for transpose
             if not transpose:
                 self.parent.data_array_image_view.set_data_array_slice(
-                    data_array_slice
+                    self.data_array,
+                    data_array_slice,
+                    axis_order
                 )
             else:
                 self.parent.data_array_image_view.set_data_array_slice(
-                    data_array_slice.T
+                    self.data_array,
+                    data_array_slice.T,
+                    axis_order
                 )
         
 # ----------------------------------------------------------------------------------
