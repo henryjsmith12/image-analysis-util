@@ -34,9 +34,12 @@ class DataArrayImageView(pg.ImageView):
             imageItem=pg.ImageItem()
         )
 
+        self.parent = parent
+
         self.data_array = None
         self.data_array_slice = None
         self.image_item = None
+        self.axis_order = None
 
         # Removes out default ImageView features
         self.ui.histogram.hide()
@@ -49,15 +52,13 @@ class DataArrayImageView(pg.ImageView):
 
     # ------------------------------------------------------------------------------
 
-    def set_data_array(self, data_array: xr.DataArray) -> None:
-        """
-        
-        """
-        self.data_array = data_array
+    def set_data_array_slice(
+        self, 
+        data_array: xr.DataArray, 
+        data_array_slice: xr.DataArray, 
+        axis_order
+    ) -> None:
 
-    # ------------------------------------------------------------------------------
-
-    def set_data_array_slice(self, data_array: xr.DataArray) -> None:
         """
         Sets image, axis labels, axis coordinates for ImageView.
 
@@ -65,18 +66,21 @@ class DataArrayImageView(pg.ImageView):
             data_array (xr.DataArray): 2D DataArray with data, coords, and dims
         """
 
+        self.data_array = data_array
+        self.axis_order = axis_order
+
         # Adds matplotlib colormap to image
-        self.data_array_slice = self._set_color_map(data_array.values)
+        self.data_array_slice = self._set_color_map(data_array_slice.values)
         self.image_item = pg.ImageItem(self.data_array_slice)
 
         # Sets plot labels
         self.view.setLabels(
-            bottom = data_array.dims[0],
-            left = data_array.dims[1]
+            bottom = data_array_slice.dims[0],
+            left = data_array_slice.dims[1]
         )
 
         # Retrieves axis starting positions and scaling
-        pos, scale = self._get_axis_coords(data_array)
+        pos, scale = self._get_axis_coords(data_array_slice)
 
         # Adds image to ImageView with proper axes
         self.setImage(self.data_array_slice, pos=pos, scale=scale)
@@ -189,13 +193,54 @@ class SlicingROI(pg.LineSegmentROI):
     def slice_data_array(self):
         p_data_array = self.parent.data_array
         p_data_array_slice = self.parent.data_array_slice
+        p_axis_order = self.parent.axis_order[:p_data_array.ndim]
+
         data, coords = self.getArrayRegion(
-            data=self.parent.data_array_slice,
-            img=self.parent.image_item,
+            data=p_data_array_slice,
+            img=self.parent.getImageItem(),
             returnMappedCoords=True
         )
-        coords = coords.astype(int)
-        #print(f"DATA: {data}\nCOORDS: {coords}")
+        x_coords, y_coords = coords.astype(int)
+        
+        if p_data_array.ndim == 2:
+            ax_0, ax_1 = p_axis_order
+            p_data_array.transpose(ax_0, ax_1)
+        if p_data_array.ndim == 3:
+            ax_0, ax_1, ax_2 = p_axis_order
+            p_data_array.transpose(ax_0, ax_1, ax_2)
+        if p_data_array.ndim == 4:
+            ax_0, ax_1, ax_2, ax_3 = p_axis_order
+            p_data_array.transpose(ax_0, ax_1, ax_2, ax_3)
+
+        for i in range(len(x_coords)):
+            if x_coords[i] < 0:
+                x_coords[i] = 0
+            if x_coords[i] >= p_data_array.values.shape[0]:
+                x_coords[i] = p_data_array.values.shape[0] - 1
+
+        for i in range(len(y_coords)):
+            if y_coords[i] < 0:
+                y_coords[i] = 0
+            if y_coords[i] >= p_data_array.values.shape[1]:
+                y_coords[i] = p_data_array.values.shape[1] - 1
+
+        c_data_array = xr.concat(
+            [p_data_array[x, y] for x, y in zip(x_coords, y_coords)],
+            f"{p_data_array.dims[0]}, {p_data_array.dims[1]}"
+        )
+
+        if c_data_array.ndim == 3:
+            c_data_array_slice = c_data_array[:, :, c_data_array.values.shape[2] - 1]
+        else:
+            c_data_array_slice = c_data_array
+        
+        c_axis_order = tuple([c_data_array.dims[i] for i in range(c_data_array.ndim)])
+
+        self.child.set_data_array_slice(
+            c_data_array,
+            c_data_array_slice,
+            c_axis_order
+        )
         
 
 
