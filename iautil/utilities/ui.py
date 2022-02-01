@@ -171,6 +171,33 @@ class DataArrayPlot(pg.PlotWidget):
     def __init__(self, parent=None, plotItem=None) -> None:
         super(DataArrayPlot, self).__init__(parent, plotItem)
 
+    # ------------------------------------------------------------------------------
+
+    def set_data_array_slice(
+        self, 
+        data_array: xr.DataArray, 
+        data_array_slice: xr.DataArray, 
+        axis_order
+    ) -> None:
+        """
+        
+        """
+
+        self.data_array = data_array
+        self.axis_order = axis_order
+
+        # Adds matplotlib colormap to image
+        self.data_array_slice = data_array_slice.values
+
+        # Sets plot labels
+        self.view.setLabels(
+            bottom = data_array_slice.dims[0]
+        )
+
+        # Adds image to ImageView with proper axes
+        self.plot(self.data_array_slice)
+
+
 # ----------------------------------------------------------------------------------
 
 class SlicingROI(pg.LineSegmentROI):
