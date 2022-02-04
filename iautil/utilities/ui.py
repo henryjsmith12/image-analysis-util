@@ -171,6 +171,8 @@ class DataArrayPlot(pg.PlotWidget):
     def __init__(self, parent=None, plotItem=None) -> None:
         super(DataArrayPlot, self).__init__(parent, plotItem)
 
+        self.setBackground("default")
+
     # ------------------------------------------------------------------------------
 
     def set_data_array_slice(
@@ -180,7 +182,7 @@ class DataArrayPlot(pg.PlotWidget):
         axis_order
     ) -> None:
         """
-        
+
         """
 
         self.data_array = data_array
@@ -190,12 +192,12 @@ class DataArrayPlot(pg.PlotWidget):
         self.data_array_slice = data_array_slice.values
 
         # Sets plot labels
-        self.view.setLabels(
+        self.setLabels(
             bottom = data_array_slice.dims[0]
         )
 
         # Adds image to ImageView with proper axes
-        self.plot(self.data_array_slice)
+        self.plot(self.data_array_slice, clear=True)
 
 
 # ----------------------------------------------------------------------------------
