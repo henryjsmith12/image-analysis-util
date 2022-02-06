@@ -119,59 +119,47 @@ class DataArrayController(QtGui.QWidget):
         axis_order = []
         transpose = False
         x_index, y_index = 0, 0
+        z, t = 0, 0
 
         # Loops through axes
         for i in range(self.data_array.ndim):
-            
             axis_order.append(
                 self.data_array.dims[AXES_DICT[self.axis_cbx_list[i].currentText()]]
             )
-
-            # Checks is axis is enabled (not x or y)
-            if self.value_slider_list[i].isEnabled():
-                # Adds value index to string for NumPy args
-                str_numpy_args += f"{self.value_slider_list[i].value()}"
+            if self.axis_cbx_list[i].currentIndex() == 0:
+                x_index = i
+            elif self.axis_cbx_list[i].currentIndex() == 1:
+                y_index = i
+            elif self.axis_cbx_list[i].currentIndex() == 2:
+                z = self.value_slider_list[i].value()
             else:
-                str_numpy_args += ":"
+                t = self.value_slider_list[i].value()
 
-                # Checks for conditions to transpose
-                if self.axis_cbx_list[i].currentIndex() == 0:
-                    x_index = i
-                else:
-                    y_index = i
-
-            # Adds commas in between args
-            if i < self.data_array.ndim - 1:
-                str_numpy_args += ","
-
+        # Transposes DataArray to match axis order
         axis_order = tuple(axis_order)
-        
-        # Transposes image if y occurs before x
-        if y_index < x_index:
-            transpose = True
-        
-        # Converts a string into numpy arguments
-        numpy_args = eval(f'np.s_[{str_numpy_args}]')
+        if self.data_array.ndim == 2:
+            ax_0, ax_1 = axis_order
+            data_array_T = self.data_array.transpose(ax_0, ax_1)
+        if self.data_array.ndim == 3:
+            ax_0, ax_1, ax_2 = axis_order
+            data_array_T = self.data_array.transpose(ax_0, ax_1, ax_2)
+        if self.data_array.ndim == 4:
+            ax_0, ax_1, ax_2, ax_3 = axis_order
+            data_array_T = self.data_array.transpose(ax_0, ax_1, ax_2, ax_3)
 
-        # DataArray slice
-        data_array_slice = self.data_array[numpy_args]
+        # Creates DataArray Slice to be displayed
+        data_array_slice = data_array_T[:, :, z, t]
+        # Checks for possible x-y transposition condition
+        if x_index > y_index:
+            data_array_slice = data_array_slice.T
 
         # Checks for empty slice
         if data_array_slice.values.ndim != 0:
-
-            # Checks for transpose
-            if not transpose:
-                self.parent.data_array_image_view.set_data_array_slice(
-                    self.data_array,
-                    data_array_slice,
-                    axis_order
-                )
-            else:
-                self.parent.data_array_image_view.set_data_array_slice(
-                    self.data_array,
-                    data_array_slice.T,
-                    axis_order
-                )
+            self.parent.data_array_image_view.set_data_array_slice(
+                data_array_T,
+                data_array_slice
+            )
+            
         
 # ----------------------------------------------------------------------------------
 
