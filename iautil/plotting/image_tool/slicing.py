@@ -142,10 +142,6 @@ class SlicingROI(pg.LineSegmentROI):
         p_data_array = self.parent.data_array
         p_data_array_slice = self.parent.data_array_slice
 
-        print(f"pda shape: {p_data_array.shape}")
-        print(f"pda slice shape: {p_data_array_slice.shape}")
-        print(f"pda dims: {p_data_array.dims}")
-
         data, coords = self.getArrayRegion(
             data=p_data_array_slice,
             img=self.parent.getImageItem(),
@@ -232,10 +228,13 @@ class SlicingGroupBox(QtGui.QGroupBox):
         self.parent_roi.center()
 
         self.center_btn.clicked.connect(self.parent_roi.center)
+        if self.child_roi is not None:
+            self.parent_roi.sigRegionChanged.connect(self.child_roi.slice_data_array)
 
     # ------------------------------------------------------------------------------
 
     def _toggle_enabled(self):
         ...
 
+    # ------------------------------------------------------------------------------
 
