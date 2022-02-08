@@ -136,19 +136,21 @@ class DataArrayController(QtGui.QWidget):
                 t = self.value_slider_list[i].value()
 
         # Transposes DataArray to match axis order
+        # Creates DataArray Slice to be displayed
         axis_order = tuple(axis_order)
         if self.data_array.ndim == 2:
             ax_0, ax_1 = axis_order
             data_array_T = self.data_array.transpose(ax_0, ax_1)
+            data_array_slice = data_array_T
         if self.data_array.ndim == 3:
             ax_0, ax_1, ax_2 = axis_order
             data_array_T = self.data_array.transpose(ax_0, ax_1, ax_2)
+            data_array_slice = data_array_T[:, :, z]
         if self.data_array.ndim == 4:
             ax_0, ax_1, ax_2, ax_3 = axis_order
             data_array_T = self.data_array.transpose(ax_0, ax_1, ax_2, ax_3)
-
-        # Creates DataArray Slice to be displayed
-        data_array_slice = data_array_T[:, :, z, t]
+            data_array_slice = data_array_T[:, :, z, t]
+        
         # Checks for possible x-y transposition condition
         if x_index > y_index:
             data_array_slice = data_array_slice.T
