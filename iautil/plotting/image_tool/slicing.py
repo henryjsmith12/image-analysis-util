@@ -93,10 +93,10 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.groupbox_3d = SlicingGroupBox(
                 parent_roi=self.slicing_roi_4d,
                 child_roi=self.slicing_roi_3d,
-                child_gbx=self.groupbox_2d,
                 image_view=self.image_view_3d,
                 ndim=3
             )
+            self.groupbox_3d.enable_chkbx.setChecked(False)
             self.addWidget(self.groupbox_3d)
             self.setRowStretch(2, 1)
 
@@ -104,23 +104,29 @@ class SlicingWidgetLayout(QtGui.QGridLayout):
             self.groupbox_2d = SlicingGroupBox(
                 parent_roi=self.slicing_roi_3d,
                 child_roi=self.slicing_roi_2d,
-                parent_gbx=self.groupbox_3d,
-                child_gbx=self.groupbox_1d,
                 image_view=self.image_view_2d,
                 ndim=2
             )
+            self.groupbox_2d.hide()
+            self.groupbox_2d.enable_chkbx.setChecked(False)
             self.addWidget(self.groupbox_2d)
             self.setRowStretch(1, 1)
 
         if data_array.ndim >= 2:
             self.groupbox_1d = SlicingGroupBox(
                 parent_roi=self.slicing_roi_2d,
-                parent_gbx=self.groupbox_2d,
                 image_view=self.plot_1d,
                 ndim=1
             )
+            self.groupbox_1d.hide()
+            self.groupbox_1d.enable_chkbx.setChecked(False)
             self.addWidget(self.groupbox_1d)
             self.setRowStretch(0, 1)
+
+        self.groupbox_3d.child_gbx = self.groupbox_2d
+        self.groupbox_2d.child_gbx = self.groupbox_1d
+        self.groupbox_2d.parent_gbx = self.groupbox_3d
+        self.groupbox_1d.parent_gbx = self.groupbox_2d
 
 # ----------------------------------------------------------------------------------
 
@@ -204,15 +210,19 @@ class SlicingGroupBox(QtGui.QGroupBox):
 
         self.parent_roi = parent_roi
         self.child_roi = child_roi
+        self.parent_gbx = parent_gbx
+        self.child_gbx = child_gbx
         self.data_array_image_view = image_view
 
-        self.layout = QtGui.QGridLayout()
-        self.setLayout(self.layout)
+        self.parent_roi.hide()
 
         self.slider_lbl = QtGui.QLabel()
         self.slider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.enable_chkbx = QtGui.QCheckBox("Enable ROI")
         self.center_btn = QtGui.QPushButton("Center ROI")
+
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
 
         if ndim == 3:
             self.layout.addWidget(image_view, 0, 0, 4, 4)
@@ -228,13 +238,25 @@ class SlicingGroupBox(QtGui.QGroupBox):
         self.parent_roi.center()
 
         self.center_btn.clicked.connect(self.parent_roi.center)
+        self.enable_chkbx.stateChanged.connect(self._toggle_enabled)
         if self.child_roi is not None:
             self.parent_roi.sigRegionChanged.connect(self.child_roi.slice_data_array)
 
     # ------------------------------------------------------------------------------
 
     def _toggle_enabled(self):
-        ...
+        if self.sender().isChecked():
+            self.parent_roi.show()
+            self.data_array_image_view.setEnabled(True)
+            if self.child_gbx is not None:
+                self.child_gbx.show()
+        else:
+            self.parent_roi.hide()
+            self.data_array_image_view.clear()
+            self.data_array_image_view.setEnabled(False)
+            if self.child_gbx is not None:
+                self.child_gbx.enable_chkbx.setChecked(False)
+                self.child_gbx.hide()
 
     # ------------------------------------------------------------------------------
 
