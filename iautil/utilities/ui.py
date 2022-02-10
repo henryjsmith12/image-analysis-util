@@ -70,17 +70,18 @@ class DataArrayImageView(pg.ImageView):
         self.data_array_slice = self._set_color_map(data_array_slice.values)
         self.image_item = pg.ImageItem(self.data_array_slice)
 
-        # Sets plot labels
-        self.view.setLabels(
-            bottom = data_array_slice.dims[0],
-            left = data_array_slice.dims[1]
-        )
+        if self.isEnabled():
+            # Sets plot labels
+            self.view.setLabels(
+                bottom = data_array_slice.dims[0],
+                left = data_array_slice.dims[1]
+            )
 
-        # Retrieves axis starting positions and scaling
-        pos, scale = self._get_axis_coords(data_array_slice)
+            # Retrieves axis starting positions and scaling
+            pos, scale = self._get_axis_coords(data_array_slice)
 
-        # Adds image to ImageView with proper axes
-        self.setImage(self.data_array_slice, pos=pos, scale=scale)
+            # Adds image to ImageView with proper axes
+            self.setImage(self.data_array_slice, pos=pos, scale=scale)
 
     # ------------------------------------------------------------------------------
 
@@ -185,12 +186,13 @@ class DataArrayPlot(pg.PlotWidget):
         
         self.data_array_slice = data_array_slice.values
 
-        # Sets plot labels
-        self.setLabels(
-            bottom = data_array_slice.dims[0]
-        )
+        if self.isEnabled():
+            # Sets plot labels
+            self.setLabels(
+                bottom = data_array_slice.dims[0]
+            )
 
-        # Adds image to ImageView with proper axes
-        self.plot(self.data_array_slice, clear=True)
+            # Adds image to ImageView with proper axes
+            self.plot(self.data_array_slice, clear=True)
 
 # ----------------------------------------------------------------------------------
