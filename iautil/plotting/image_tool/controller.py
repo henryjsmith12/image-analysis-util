@@ -4,7 +4,6 @@ Controls DataArray slice in ImageView.
 
 # ----------------------------------------------------------------------------------
 
-from aiosignal import Signal
 import numpy as np
 import pyqtgraph as pg
 from PyQt5 import QtGui, QtCore
@@ -87,14 +86,12 @@ class DataArrayController(QtGui.QWidget):
         Determines slice to display in ImageView.
         """
 
-        
         if self.data_array.ndim == 2:
             data_array_slice = self.data_array[:, :]
         
         if self.data_array.ndim == 3:
             z = self.layout.itemAt(2).widget().value_slider.value()
             data_array_slice = self.data_array[:, :, z]
-            print(z)
 
         if self.data_array.ndim == 4:
             z = self.layout.itemAt(2).widget().value_slider.value()
@@ -105,6 +102,7 @@ class DataArrayController(QtGui.QWidget):
             self.data_array,
             data_array_slice
         )
+
     # ------------------------------------------------------------------------------
     # Functions for dragging/dropping dimension controllers
 
