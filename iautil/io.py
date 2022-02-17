@@ -11,7 +11,7 @@ import ast
 import h5py
 import numpy as np
 import os
-from typing import List, Tuple
+from typing import List
 import vtk
 from vtk.util import numpy_support as npSup # type: ignore
 import xarray as xr
@@ -95,23 +95,21 @@ def vti_to_iau(
     dims: list = None,
     metadata: dict = None
 ):
+    """
+    Creates IAU file from VTI file(s).
+
+    Parameters:
+    iau_path (str): Path to save file in.
+    data (np.ndarray): A numpy array of data points to be stored in file.
+    coords (list): A list of lists of coordinates for each dimension of dataset.
+    dims (list): A list of labels for each dimension of dataset.
+    metadata (dict): Metadata for file.
+    """
+
     if vti_path is None:
         raise ValueError("VTI path not given.")
     if type(vti_path) != str:
         raise ValueError("VTI path must be a string.")
-
-    if iau_path is None:
-        raise ValueError("IAU path not given.")
-    if type(iau_path) != str:
-        raise ValueError("IAU path must be a string.")
-
-    if dims is not None:
-        if type(dims) != list:
-            raise ValueError("dims must be a list.")
-
-    if metadata is not None:
-        if type(metadata) != dict:
-            raise ValueError("metadata must be a dictionary.")
 
     # Data source as directory
     if os.path.isdir(vti_path):
