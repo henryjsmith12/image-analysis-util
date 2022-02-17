@@ -95,6 +95,24 @@ def vti_to_iau(
     dims: list = None,
     metadata: dict = None
 ):
+    if vti_path is None:
+        raise ValueError("VTI path not given.")
+    if type(vti_path) != str:
+        raise ValueError("VTI path must be a string.")
+
+    if iau_path is None:
+        raise ValueError("IAU path not given.")
+    if type(iau_path) != str:
+        raise ValueError("IAU path must be a string.")
+
+    if dims is not None:
+        if type(dims) != list:
+            raise ValueError("dims must be a list.")
+
+    if metadata is not None:
+        if type(metadata) != dict:
+            raise ValueError("metadata must be a dictionary.")
+
     # Data source as directory
     if os.path.isdir(vti_path):
         file_list = os.listdir(vti_path) # directory contents, sorted
@@ -102,9 +120,10 @@ def vti_to_iau(
         data_list, coords_list = [], []
 
         for file in file_list:
-            data, coords = _load_vti(str(os.path.join(vti_path, file)))
-            data_list.append(data)
-            coords_list.append(coords)
+            if file.endswith(".vti"):
+                data, coords = _load_vti(str(os.path.join(vti_path, file)))
+                data_list.append(data)
+                coords_list.append(coords)
         data, coords = _stitch(data_list, coords_list)
 
         # Handles new axis values 
@@ -113,8 +132,11 @@ def vti_to_iau(
         coords.append(new_dim_coords)
 
     # Data source as file
-    else:
+    elif os.path.isfile(vti_path):
         data, coords = _load_vti(vti_path)
+
+    else:
+        raise RuntimeError("Invalid VTI path.")
 
     create_iau(
         iau_path=iau_path,
