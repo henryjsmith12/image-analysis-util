@@ -82,12 +82,10 @@ class ImageToolWidget(QtGui.QWidget):
         """
 
         from iautil.plotting.image_tool.controller import DataArrayController
-        from iautil.plotting.image_tool.slicing import SlicingWidget
         from iautil.utilities.ui import DataArrayImageView
         
         self.data_array_image_view = DataArrayImageView()
         self.data_array_controller = DataArrayController(self.data_array, self)
-        self.slicing_widget = SlicingWidget(self.data_array, self)
         
     # ------------------------------------------------------------------------------
     
@@ -110,17 +108,8 @@ class ImageToolWidget(QtGui.QWidget):
             hideTitle=True
         )
 
-        self.slicing_widget_dock = dockarea.Dock(
-            name="Slicing",
-            size=(200, 300),
-            widget=self.slicing_widget,
-            hideTitle=False
-        )
-
-        self.dock_area.addDock(self.slicing_widget_dock)
-        self.dock_area.addDock(self.data_array_image_view_dock, "left", self.slicing_widget_dock)
-        self.dock_area.addDock(self.controller_widget_dock, "left", self.slicing_widget_dock)
-        self.dock_area.moveDock(self.controller_widget_dock, "bottom", 
+        self.dock_area.addDock(self.data_array_image_view_dock)
+        self.dock_area.addDock(self.controller_widget_dock, "bottom", 
             self.data_array_image_view_dock)
 
 # ----------------------------------------------------------------------------------
