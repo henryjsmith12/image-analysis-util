@@ -50,7 +50,7 @@ pip install image-analysis-util
 
 ## Screenshots
 
-`<img src="https://github.com/henryjsmith12/image-analysis-util/blob/main/examples/screenshots/image_tool_4D.png" width="500"/>`
+<img src="https://github.com/henryjsmith12/image-analysis-util/blob/main/examples/screenshots/image_tool_4D.png" width="500"/>
 
 ## Roadmap
 
