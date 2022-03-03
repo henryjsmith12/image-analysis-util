@@ -4,7 +4,6 @@ Tests for io.py
 
 # ----------------------------------------------------------------------------------
 
-from curses import meta
 import numpy as np
 import os
 import unittest
