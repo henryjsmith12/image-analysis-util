@@ -82,10 +82,12 @@ class ImageToolWidget(QtGui.QWidget):
         """
 
         from iautil.plotting.image_tool.controller import DataArrayController
+        from iautil.plotting.image_tool.slicing import SlicingTab
         from iautil.utilities.ui import DataArrayImageView
         
         self.data_array_image_view = DataArrayImageView()
         self.data_array_controller = DataArrayController(self.data_array, self)
+        self.slicing_tab = SlicingTab(self.data_array, self)
         
     # ------------------------------------------------------------------------------
     
@@ -96,7 +98,7 @@ class ImageToolWidget(QtGui.QWidget):
 
         self.data_array_image_view_dock = dockarea.Dock(
             name="DataArray ImageView",
-            size=(200, 200),
+            size=(200, 300),
             widget=self.data_array_image_view,
             hideTitle=True
         )
@@ -104,12 +106,27 @@ class ImageToolWidget(QtGui.QWidget):
         self.controller_widget_dock = dockarea.Dock(
             name="DataArray Controller",
             size=(200, 100),
-            widget=self.data_array_controller,
-            hideTitle=True
+            widget=self.data_array_controller
+        )
+        
+        self.info_widget_dock = dockarea.Dock(
+            name="DataArray Info",
+            size=(200, 100),
+            widget=None
+        )
+
+        self.slicing_tab_dock = dockarea.Dock(
+            name="Slicing",
+            size=(200, 400),
+            widget=self.slicing_tab
         )
 
         self.dock_area.addDock(self.data_array_image_view_dock)
+        self.dock_area.addDock(self.slicing_tab_dock, "right", 
+            self.data_array_image_view_dock)
         self.dock_area.addDock(self.controller_widget_dock, "bottom", 
             self.data_array_image_view_dock)
+        self.dock_area.addDock(self.info_widget_dock, "below", 
+            self.controller_widget_dock)
 
 # ----------------------------------------------------------------------------------
