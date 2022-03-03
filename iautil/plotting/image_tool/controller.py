@@ -35,7 +35,7 @@ class DataArrayController(QtGui.QWidget):
 
         # Loops through axes
         for i in range(data_array.ndim):
-            self.dim_ctrl_list.append(DimensionController(data_array, i))
+            self.dim_ctrl_list.append(DimensionController(data_array, i, parent=self))
             self.value_slider_list.append(self.dim_ctrl_list[i].value_slider)
             self.value_cbx_list.append(self.dim_ctrl_list[i].value_cbx)
 
@@ -133,16 +133,22 @@ class DimensionController(QtGui.QGroupBox):
 
     updated = QtCore.pyqtSignal()
         
-    def __init__(self, data_array: xr.DataArray, dim: int, parent=None) -> None:
+    def __init__(
+        self, 
+        data_array: xr.DataArray, 
+        dim: int = None, 
+        parent=None
+    ) -> None:
         super(DimensionController, self).__init__(parent)
 
         self.parent = parent
         self.data_array = data_array
 
-        self.dim_lbl = QtGui.QLabel(data_array.dims[dim])
+        self.dim_lbl = QtGui.QLabel()
         self.value_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.value_cbx = QtGui.QComboBox()
 
+        self.dim_lbl.setText(data_array.dims[dim])
         raw_coords = data_array.coords[data_array.dims[dim]].values
         if not type(raw_coords[0]) == str:
             raw_coords = [round(i, 5) for i in raw_coords]
@@ -162,6 +168,18 @@ class DimensionController(QtGui.QGroupBox):
         self.value_cbx.currentIndexChanged.connect(self._update_value)
 
     # ------------------------------------------------------------------------------
+
+    def _set_dimension(self, dim):
+        self.dim_lbl.setText(self.data_array.dims[dim])
+        raw_coords = self.data_array.coords[self.data_array.dims[dim]].values
+        if not type(raw_coords[0]) == str:
+            raw_coords = [round(i, 5) for i in raw_coords]
+        dim_coords = list(map(str, raw_coords))
+
+        self.value_slider.setMaximum(self.data_array.shape[dim] - 1)
+        self.value_cbx.addItems(dim_coords)
+
+    # ------------------------------------------------------------------------------
     
     def _update_value(self, e):
         if isinstance(self.sender(), QtGui.QSlider):
@@ -177,10 +195,11 @@ class DimensionController(QtGui.QGroupBox):
     # Function for dragging/dropping
 
     def mouseMoveEvent(self, e):
-        if e.buttons() == QtCore.Qt.LeftButton:
-            drag = QtGui.QDrag(self)
-            mime = QtCore.QMimeData()
-            drag.setMimeData(mime)
-            drag.exec_(QtCore.Qt.MoveAction)
+        if isinstance(self.parent, DataArrayController):
+            if e.buttons() == QtCore.Qt.LeftButton:
+                drag = QtGui.QDrag(self)
+                mime = QtCore.QMimeData()
+                drag.setMimeData(mime)
+                drag.exec_(QtCore.Qt.MoveAction)
 
 # ----------------------------------------------------------------------------------
