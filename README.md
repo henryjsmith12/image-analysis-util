@@ -54,8 +54,9 @@ pip install image-analysis-util
 
 ## Roadmap
 
-* [ ] Slicing/linecut tab
-* [ ] ROI tab
+* [ ] SlicingROI enable/disable
+* [ ] Manual SlicingROI controls
+* [ ] Slice "Export" button
 
 ## License
 
