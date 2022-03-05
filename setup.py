@@ -18,7 +18,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Henry Smith",
     author_email="smithh@anl.gov",
-    url="https://github.com/henryjsmith12/image-analysis-util/iautil",
+    url="https://github.com/henryjsmith12/image-analysis-util",
     install_requires=[
         "h5py",
         "numpy",
