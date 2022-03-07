@@ -137,7 +137,7 @@ class SlicingController(QtGui.QWidget):
         self.setLayout(self.layout)
 
         self.layout.addWidget(self.center_btn, 0, 0)
-        self.layout.addWidget(self.export_btn, 0, 1)
+        #self.layout.addWidget(self.export_btn, 0, 1)
 
         '''
         for i in range(self.data_array.ndim):
