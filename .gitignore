@@ -50,4 +50,4 @@ coverage.xml
 docs/_build/
 .DS_Store
 *.iau
-image_tool_testing.ipynb
+test_full_data_image_tool.py
