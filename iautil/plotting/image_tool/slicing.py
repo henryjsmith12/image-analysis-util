@@ -71,13 +71,13 @@ class SlicingWidget(dockarea.DockArea):
         # Subwidgets
         if dim == 2:
             self.image_view = DataArrayPlot()
-            self.controller = SlicingController(self)
+            self.controller = SlicingController(self, data_array)
         elif dim == 3:
             self.image_view = DataArrayImageView()
-            self.controller = SlicingController(self)
+            self.controller = SlicingController(self, data_array)
         elif dim == 4:
             self.image_view = DataArrayImageView()
-            self.controller = SlicingController(self)
+            self.controller = SlicingController(self, data_array)
             self.slider = DimensionController(data_array, 3, self.main_controller)
             
         # Docks
@@ -156,6 +156,7 @@ class SlicingWidget(dockarea.DockArea):
         self.image_view.setEnabled(True)
         self.roi.show()
         self.roi.center()
+        self.controller.slicing_roi_controller.setEnabled(True)
 
         if self.child is not None:
             self.child.controller.setEnabled(True)
@@ -168,6 +169,7 @@ class SlicingWidget(dockarea.DockArea):
         self.image_view.clear()
         self.image_view.setEnabled(False)
         self.roi.hide()
+        self.controller.slicing_roi_controller.setEnabled(False)
         
         if self.child is not None:
             self.child.controller.enable_chkbx.setChecked(False)
@@ -177,9 +179,12 @@ class SlicingWidget(dockarea.DockArea):
 
 class SlicingController(QtGui.QWidget):
 
-    def __init__(self, slicing_widget) -> None:
+    def __init__(self, slicing_widget, data_array) -> None:
         super(SlicingController, self).__init__(slicing_widget)
 
+        self.slicing_widget = slicing_widget
+
+        self.slicing_roi_controller = SlicingROIController(data_array, self)
         self.enable_chkbx = QtGui.QCheckBox("Enable")
         self.center_btn = QtGui.QPushButton("Center")
         self.export_btn = QtGui.QPushButton("Export")
@@ -187,19 +192,17 @@ class SlicingController(QtGui.QWidget):
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
 
-        self.layout.addWidget(self.enable_chkbx, 0, 0)
-        self.layout.addWidget(self.center_btn, 0, 1)
-        #self.layout.addWidget(self.export_btn, 0, 2)
+        self.layout.addWidget(self.slicing_roi_controller, 0, 0, 1, 3)
+        self.layout.addWidget(self.enable_chkbx, 1, 0)
+        self.layout.addWidget(self.center_btn, 1, 1)
+        self.layout.addWidget(self.export_btn, 1, 2)
 
         self.layout.setColumnStretch(0, 1)
         self.layout.setColumnStretch(1, 1)
         self.layout.setColumnStretch(2, 1)
 
-
-# ----------------------------------------------------------------------------------
-
-class SlicingDimensionController(QtGui.QWidget):
-    ...
+        self.layout.setRowStretch(0, 6)
+        self.layout.setRowStretch(1, 1)
 
 # ----------------------------------------------------------------------------------
 
@@ -225,6 +228,8 @@ class SlicingROI(pg.LineSegmentROI):
                 returnMappedCoords=True
             )
             x_coords, y_coords = coords.astype(int)
+
+            self.coords = x_coords, y_coords
 
             for i in range(len(x_coords)):
                 if x_coords[i] < 0:
@@ -257,7 +262,6 @@ class SlicingROI(pg.LineSegmentROI):
     # ------------------------------------------------------------------------------
 
     def center(self):
-
         p_data_array = self.parent_imv.data_array
         x_1 = p_data_array.coords[p_data_array.dims[0]].values[0]
         x_2 = p_data_array.coords[p_data_array.dims[0]].values[-1]
@@ -266,5 +270,112 @@ class SlicingROI(pg.LineSegmentROI):
 
         self.movePoint(self.getHandles()[0], (x_1, y_1))
         self.movePoint(self.getHandles()[1], (x_2, y_2))
+
+# ----------------------------------------------------------------------------------
+
+class SlicingROIController(QtGui.QWidget):
+
+    def __init__(self, data_array, parent=None) -> None:
+        super(SlicingROIController, self).__init__()
+
+        self.parent = parent
+        self.roi = self.parent.slicing_widget.roi
+        self.main_controller = self.parent.slicing_widget.main_controller
+
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
+
+        self.dim_ctrls = []
+        for i in range(data_array.ndim):
+            self.dim_ctrls.append(SlicingROIDimensionController(self))
+
+            self.layout.addWidget(self.dim_ctrls[i], i, 0)
+
+        self.main_controller.updated.connect(self.set_dimension_order)
+        self.roi.sigRegionChanged.connect(self.update_controller)
+
+        self.set_dimension_order()
+
+    # ------------------------------------------------------------------------------
+
+    def set_dimension_order(self):
+        self.data_array = self.main_controller.data_array
+
+        for i in range(self.data_array.ndim):
+            self.dim_ctrls[i].set_dimension(i)
+
+    # ------------------------------------------------------------------------------
+
+    def update_controller(self):
+        if self.roi.coords is not None:
+            self.data_array = self.main_controller.data_array
+            slice_degree = self.data_array.ndim - self.roi.parent_imv.data_array.ndim
+
+            x_1_index, x_2_index = self.roi.coords[0][0], self.roi.coords[0][-1]
+            y_1_index, y_2_index = self.roi.coords[1][0], self.roi.coords[1][-1]
+
+            if slice_degree == 0:
+                self.dim_ctrls[0].endpoint_1_cbx.setCurrentIndex(x_1_index)
+                self.dim_ctrls[0].endpoint_2_cbx.setCurrentIndex(x_2_index)
+                self.dim_ctrls[1].endpoint_1_cbx.setCurrentIndex(y_1_index)
+                self.dim_ctrls[1].endpoint_2_cbx.setCurrentIndex(y_2_index)
+                for i in range(2, self.data_array.ndim):
+                    self.dim_ctrls[i].setEnabled(False)
+            elif slice_degree == 1:
+                self.dim_ctrls[0].endpoint_1_cbx.setCurrentIndex(x_1_index)
+                self.dim_ctrls[0].endpoint_2_cbx.setCurrentIndex(x_2_index)
+                self.dim_ctrls[1].endpoint_1_cbx.setCurrentIndex(x_1_index)
+                self.dim_ctrls[1].endpoint_2_cbx.setCurrentIndex(x_2_index)
+                self.dim_ctrls[2].endpoint_1_cbx.setCurrentIndex(y_1_index)
+                self.dim_ctrls[2].endpoint_2_cbx.setCurrentIndex(y_2_index)
+                for i in range(3, self.data_array.ndim):
+                    self.dim_ctrls[i].setEnabled(False)
+            elif slice_degree == 2:
+                self.dim_ctrls[0].endpoint_1_cbx.setCurrentIndex(x_1_index)
+                self.dim_ctrls[0].endpoint_2_cbx.setCurrentIndex(x_2_index)
+                self.dim_ctrls[1].endpoint_1_cbx.setCurrentIndex(x_1_index)
+                self.dim_ctrls[1].endpoint_2_cbx.setCurrentIndex(x_2_index)
+                self.dim_ctrls[2].endpoint_1_cbx.setCurrentIndex(x_1_index)
+                self.dim_ctrls[2].endpoint_2_cbx.setCurrentIndex(x_2_index)
+                self.dim_ctrls[3].endpoint_1_cbx.setCurrentIndex(y_1_index)
+                self.dim_ctrls[3].endpoint_2_cbx.setCurrentIndex(y_2_index)
+
+# ----------------------------------------------------------------------------------
+
+class SlicingROIDimensionController(QtGui.QWidget):
+
+    def __init__(self, parent=None) -> None:
+        super(SlicingROIDimensionController, self).__init__()
+
+        self.parent = parent
+        self.main_controller = self.parent.main_controller
+
+        self.dim_lbl = QtGui.QLabel()
+        self.endpoint_1_cbx = QtGui.QComboBox()
+        self.endpoint_2_cbx = QtGui.QComboBox()
+
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(self.dim_lbl, 0, 0)
+        self.layout.addWidget(self.endpoint_1_cbx, 0, 1, 1, 2)
+        self.layout.addWidget(self.endpoint_2_cbx, 0, 3, 1, 2)
+
+    # ------------------------------------------------------------------------------
+
+    def set_dimension(self, dim):
+        
+        self.data_array = self.main_controller.data_array
+        self.dim_lbl.setText(self.data_array.dims[dim])
+        raw_coords = self.data_array.coords[self.data_array.dims[dim]].values
+        if not type(raw_coords[0]) == str:
+            raw_coords = [round(i, 5) for i in raw_coords]
+        dim_coords = list(map(str, raw_coords))
+
+        self.endpoint_1_cbx.clear()
+        self.endpoint_1_cbx.addItems(dim_coords)
+        self.endpoint_2_cbx.clear()
+        self.endpoint_2_cbx.addItems(dim_coords)
+        self.endpoint_2_cbx.setCurrentIndex(len(dim_coords) - 1)
 
 # ----------------------------------------------------------------------------------
