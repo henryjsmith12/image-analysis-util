@@ -16,6 +16,8 @@ class DataArrayController(QtGui.QWidget):
     Controls DataArray slice in ImageView.
     """
 
+    updated = QtCore.pyqtSignal()
+
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
         super(DataArrayController, self).__init__(parent)
 
@@ -75,6 +77,8 @@ class DataArrayController(QtGui.QWidget):
         if self.data_array.ndim == 4:
             dim_0, dim_1, dim_2, dim_3 = axis_order
             self.data_array = self.data_array.transpose(dim_0, dim_1, dim_2, dim_3)
+
+        self.updated.emit()
 
         self._update_image_view()
 
@@ -136,7 +140,7 @@ class DimensionController(QtGui.QGroupBox):
     def __init__(
         self, 
         data_array: xr.DataArray, 
-        dim: int = None, 
+        dim: int, 
         parent=None
     ) -> None:
         super(DimensionController, self).__init__(parent)
@@ -148,28 +152,31 @@ class DimensionController(QtGui.QGroupBox):
         self.value_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.value_cbx = QtGui.QComboBox()
 
-        self.dim_lbl.setText(data_array.dims[dim])
-        raw_coords = data_array.coords[data_array.dims[dim]].values
-        if not type(raw_coords[0]) == str:
-            raw_coords = [round(i, 5) for i in raw_coords]
-        dim_coords = list(map(str, raw_coords))
+        if data_array is not None:
+            self.dim_lbl.setText(data_array.dims[dim])
+            raw_coords = data_array.coords[data_array.dims[dim]].values
+            if not type(raw_coords[0]) == str:
+                raw_coords = [round(i, 5) for i in raw_coords]
+            dim_coords = list(map(str, raw_coords))
 
-        self.value_slider.setMaximum(data_array.shape[dim] - 1)
-        self.value_cbx.addItems(dim_coords)
+            self.value_slider.setMaximum(data_array.shape[dim] - 1)
+            self.value_cbx.addItems(dim_coords)
 
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
 
         self.layout.addWidget(self.dim_lbl, 0, 0)
-        self.layout.addWidget(self.value_slider, 0, 1, 1, 4)
-        self.layout.addWidget(self.value_cbx, 0, 5)
+        self.layout.addWidget(self.value_slider, 0, 1, 1, 6)
+        self.layout.addWidget(self.value_cbx, 0, 7, 1, 3)
 
         self.value_slider.valueChanged.connect(self._update_value)
         self.value_cbx.currentIndexChanged.connect(self._update_value)
 
     # ------------------------------------------------------------------------------
 
-    def _set_dimension(self, dim):
+    def set_dimension(self, dim):
+
+        self.data_array = self.parent.data_array
         self.dim_lbl.setText(self.data_array.dims[dim])
         raw_coords = self.data_array.coords[self.data_array.dims[dim]].values
         if not type(raw_coords[0]) == str:
@@ -177,19 +184,22 @@ class DimensionController(QtGui.QGroupBox):
         dim_coords = list(map(str, raw_coords))
 
         self.value_slider.setMaximum(self.data_array.shape[dim] - 1)
+        self.value_slider.setValue(0)
+        self.value_cbx.clear()
         self.value_cbx.addItems(dim_coords)
 
     # ------------------------------------------------------------------------------
     
     def _update_value(self, e):
-        if isinstance(self.sender(), QtGui.QSlider):
-            value_index = self.sender().value()
-            self.value_cbx.setCurrentIndex(value_index)
+        if self.data_array is not None:
+            if isinstance(self.sender(), QtGui.QSlider):
+                value_index = self.sender().value()
+                self.value_cbx.setCurrentIndex(value_index)
 
-        if isinstance(self.sender(), QtGui.QComboBox):
-            value_index = self.sender().currentIndex()
-            self.value_slider.setValue(value_index)
-            self.updated.emit()
+            if isinstance(self.sender(), QtGui.QComboBox):
+                value_index = self.sender().currentIndex()
+                self.value_slider.setValue(value_index)
+                self.updated.emit()
 
     # ------------------------------------------------------------------------------
     # Function for dragging/dropping
