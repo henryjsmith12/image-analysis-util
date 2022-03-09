@@ -39,9 +39,11 @@ class SlicingTab(QtGui.QWidget):
                 self.slicing_widgets[i].set_child(self.slicing_widgets[i + 1])
             elif i == len(self.slicing_widgets) - 1:
                 self.slicing_widgets[i].set_parent(self.slicing_widgets[i - 1])
+                self.slicing_widgets[i].roi.parent_roi = self.slicing_widgets[i - 1].roi
             else:
                 self.slicing_widgets[i].set_parent(self.slicing_widgets[i - 1])
                 self.slicing_widgets[i].set_child(self.slicing_widgets[i + 1])
+                self.slicing_widgets[i].roi.parent_roi = self.slicing_widgets[i - 1].roi
 
             self.slicing_widgets[i].roi.child_imv = self.slicing_widgets[i].image_view
 
@@ -156,6 +158,7 @@ class SlicingWidget(dockarea.DockArea):
         self.image_view.setEnabled(True)
         self.roi.show()
         self.roi.center()
+        self.roi.center()
         self.controller.slicing_roi_controller.setEnabled(True)
 
         if self.child is not None:
@@ -212,7 +215,7 @@ class SlicingROI(pg.LineSegmentROI):
         super(SlicingROI, self).__init__(position)
         
         self.parent_imv, self.child_imv = None, None
-        self.child_roi = None
+        self.parent_roi, self.child_roi = None, None
         self.slicing_widget = None
         
     # ------------------------------------------------------------------------------
@@ -300,45 +303,79 @@ class SlicingROIController(QtGui.QWidget):
 
     def set_dimension_order(self):
         self.data_array = self.main_controller.data_array
-
+        
         for i in range(self.data_array.ndim):
             self.dim_ctrls[i].set_dimension(i)
+
+        self.update_controller()    
 
     # ------------------------------------------------------------------------------
 
     def update_controller(self):
-        if self.roi.coords is not None:
+        try:
             self.data_array = self.main_controller.data_array
             slice_degree = self.data_array.ndim - self.roi.parent_imv.data_array.ndim
 
-            x_1_index, x_2_index = self.roi.coords[0][0], self.roi.coords[0][-1]
-            y_1_index, y_2_index = self.roi.coords[1][0], self.roi.coords[1][-1]
 
             if slice_degree == 0:
-                self.dim_ctrls[0].endpoint_1_cbx.setCurrentIndex(x_1_index)
-                self.dim_ctrls[0].endpoint_2_cbx.setCurrentIndex(x_2_index)
-                self.dim_ctrls[1].endpoint_1_cbx.setCurrentIndex(y_1_index)
-                self.dim_ctrls[1].endpoint_2_cbx.setCurrentIndex(y_2_index)
+                x_indicies, y_indicies = self.roi.coords[0], self.roi.coords[1]
+
+                self.dim_ctrls[0].set_dimension(
+                    0, 
+                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x_indicies]
+                )
+                self.dim_ctrls[1].set_dimension(
+                    1, 
+                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in y_indicies]
+                )
                 for i in range(2, self.data_array.ndim):
                     self.dim_ctrls[i].setEnabled(False)
+
             elif slice_degree == 1:
-                self.dim_ctrls[0].endpoint_1_cbx.setCurrentIndex(x_1_index)
-                self.dim_ctrls[0].endpoint_2_cbx.setCurrentIndex(x_2_index)
-                self.dim_ctrls[1].endpoint_1_cbx.setCurrentIndex(x_1_index)
-                self.dim_ctrls[1].endpoint_2_cbx.setCurrentIndex(x_2_index)
-                self.dim_ctrls[2].endpoint_1_cbx.setCurrentIndex(y_1_index)
-                self.dim_ctrls[2].endpoint_2_cbx.setCurrentIndex(y_2_index)
+                x1_indicies = [self.roi.parent_roi.coords[0][i] for i in self.roi.coords[0]]
+                x2_indicies = [self.roi.parent_roi.coords[1][i] for i in self.roi.coords[0]]
+                y_indicies = self.roi.coords[1]
+
+                self.dim_ctrls[0].set_dimension(
+                    0, 
+                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies]
+                )
+                self.dim_ctrls[1].set_dimension(
+                    1, 
+                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies]
+                )
+                self.dim_ctrls[2].set_dimension(
+                    2, 
+                    coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in y_indicies]
+                )
                 for i in range(3, self.data_array.ndim):
                     self.dim_ctrls[i].setEnabled(False)
+
             elif slice_degree == 2:
-                self.dim_ctrls[0].endpoint_1_cbx.setCurrentIndex(x_1_index)
-                self.dim_ctrls[0].endpoint_2_cbx.setCurrentIndex(x_2_index)
-                self.dim_ctrls[1].endpoint_1_cbx.setCurrentIndex(x_1_index)
-                self.dim_ctrls[1].endpoint_2_cbx.setCurrentIndex(x_2_index)
-                self.dim_ctrls[2].endpoint_1_cbx.setCurrentIndex(x_1_index)
-                self.dim_ctrls[2].endpoint_2_cbx.setCurrentIndex(x_2_index)
-                self.dim_ctrls[3].endpoint_1_cbx.setCurrentIndex(y_1_index)
-                self.dim_ctrls[3].endpoint_2_cbx.setCurrentIndex(y_2_index)
+                x1_indicies = [self.roi.parent_roi.parent_roi.coords[0][i] for i in [self.roi.parent_roi.coords[0][i] for i in self.roi.coords[0]]]
+                x2_indicies = [self.roi.parent_roi.parent_roi.coords[1][i] for i in [self.roi.parent_roi.coords[0][i] for i in self.roi.coords[0]]]
+                x3_indicies = [self.roi.parent_roi.coords[1][i] for i in self.roi.coords[0]]
+                y_indicies = self.roi.coords[1]
+
+                self.dim_ctrls[0].set_dimension(
+                    0, 
+                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies]
+                )
+
+                self.dim_ctrls[1].set_dimension(
+                    1, 
+                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies]
+                )
+                self.dim_ctrls[2].set_dimension(
+                    2, 
+                    coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in x3_indicies]
+                )
+                self.dim_ctrls[3].set_dimension(
+                    3, 
+                    coords=[self.data_array.coords[self.data_array.dims[3]].values[i] for i in y_indicies]
+                )
+        except:
+            ...
 
 # ----------------------------------------------------------------------------------
 
@@ -363,11 +400,14 @@ class SlicingROIDimensionController(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
-    def set_dimension(self, dim):
+    def set_dimension(self, dim, coords=None):
         
         self.data_array = self.main_controller.data_array
         self.dim_lbl.setText(self.data_array.dims[dim])
         raw_coords = self.data_array.coords[self.data_array.dims[dim]].values
+        if coords is not None:
+            raw_coords = coords
+
         if not type(raw_coords[0]) == str:
             raw_coords = [round(i, 5) for i in raw_coords]
         dim_coords = list(map(str, raw_coords))
