@@ -316,63 +316,68 @@ class SlicingROIController(QtGui.QWidget):
             self.data_array = self.main_controller.data_array
             slice_degree = self.data_array.ndim - self.roi.parent_imv.data_array.ndim
 
-
             if slice_degree == 0:
-                x_indicies, y_indicies = self.roi.coords[0], self.roi.coords[1]
-
                 self.dim_ctrls[0].set_dimension(
                     0, 
-                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x_indicies]
+                    coords=self.data_array.coords[self.data_array.dims[0]].values,
+                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
                 )
                 self.dim_ctrls[1].set_dimension(
                     1, 
-                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in y_indicies]
+                    coords=self.data_array.coords[self.data_array.dims[1]].values,
+                    ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
                 )
                 for i in range(2, self.data_array.ndim):
                     self.dim_ctrls[i].setEnabled(False)
 
             elif slice_degree == 1:
-                x1_indicies = [self.roi.parent_roi.coords[0][i] for i in self.roi.coords[0]]
-                x2_indicies = [self.roi.parent_roi.coords[1][i] for i in self.roi.coords[0]]
+                x1_indicies = self.roi.parent_roi.coords[0]
+                x2_indicies = self.roi.parent_roi.coords[1]
                 y_indicies = self.roi.coords[1]
 
                 self.dim_ctrls[0].set_dimension(
                     0, 
-                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies]
+                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies],
+                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
                 )
                 self.dim_ctrls[1].set_dimension(
                     1, 
-                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies]
+                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies],
+                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
                 )
                 self.dim_ctrls[2].set_dimension(
                     2, 
-                    coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in y_indicies]
+                    coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in y_indicies],
+                    ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
                 )
                 for i in range(3, self.data_array.ndim):
                     self.dim_ctrls[i].setEnabled(False)
 
             elif slice_degree == 2:
-                x1_indicies = [self.roi.parent_roi.parent_roi.coords[0][i] for i in [self.roi.parent_roi.coords[0][i] for i in self.roi.coords[0]]]
-                x2_indicies = [self.roi.parent_roi.parent_roi.coords[1][i] for i in [self.roi.parent_roi.coords[0][i] for i in self.roi.coords[0]]]
-                x3_indicies = [self.roi.parent_roi.coords[1][i] for i in self.roi.coords[0]]
+                x1_indicies = self.roi.parent_roi.parent_roi.coords[0]
+                x2_indicies = self.roi.parent_roi.parent_roi.coords[1]
+                x3_indicies = self.roi.parent_roi.coords[1]
                 y_indicies = self.roi.coords[1]
 
                 self.dim_ctrls[0].set_dimension(
                     0, 
-                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies]
+                    coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies],
+                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
                 )
-
                 self.dim_ctrls[1].set_dimension(
                     1, 
-                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies]
+                    coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies],
+                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
                 )
                 self.dim_ctrls[2].set_dimension(
                     2, 
-                    coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in x3_indicies]
+                    coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in x3_indicies],
+                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
                 )
                 self.dim_ctrls[3].set_dimension(
                     3, 
-                    coords=[self.data_array.coords[self.data_array.dims[3]].values[i] for i in y_indicies]
+                    coords=[self.data_array.coords[self.data_array.dims[3]].values[i] for i in y_indicies],
+                    ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
                 )
         except:
             ...
@@ -400,7 +405,7 @@ class SlicingROIDimensionController(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
-    def set_dimension(self, dim, coords=None):
+    def set_dimension(self, dim, coords=None, ends=None):
         
         self.data_array = self.main_controller.data_array
         self.dim_lbl.setText(self.data_array.dims[dim])
@@ -413,9 +418,13 @@ class SlicingROIDimensionController(QtGui.QWidget):
         dim_coords = list(map(str, raw_coords))
 
         self.endpoint_1_cbx.clear()
-        self.endpoint_1_cbx.addItems(dim_coords)
         self.endpoint_2_cbx.clear()
+        self.endpoint_1_cbx.addItems(dim_coords)
         self.endpoint_2_cbx.addItems(dim_coords)
-        self.endpoint_2_cbx.setCurrentIndex(len(dim_coords) - 1)
+        if ends is None:
+            self.endpoint_2_cbx.setCurrentIndex(len(dim_coords) - 1)
+        else:
+            self.endpoint_1_cbx.setCurrentIndex(ends[0])
+            self.endpoint_2_cbx.setCurrentIndex(ends[1])
 
 # ----------------------------------------------------------------------------------
