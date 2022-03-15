@@ -126,7 +126,7 @@ class ImageToolWidget(QtGui.QWidget):
             self.data_array_image_view_dock)
         self.dock_area.addDock(self.controller_widget_dock, "bottom", 
             self.data_array_image_view_dock)
-        self.dock_area.addDock(self.info_widget_dock, "below", 
-            self.controller_widget_dock)
+        #self.dock_area.addDock(self.info_widget_dock, "below", 
+            #self.controller_widget_dock)
 
 # ----------------------------------------------------------------------------------
