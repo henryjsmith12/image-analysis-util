@@ -140,7 +140,7 @@ class SlicingWidget(dockarea.DockArea):
         self.child = child
 
         self.roi.child_roi = child.roi
-        self.roi.sigRegionChangeFinished.connect(self.roi.child_roi.slice_data_array)
+        self.roi.sigRegionChanged.connect(self.roi.child_roi.slice_data_array)
 
     # ------------------------------------------------------------------------------
 
@@ -159,7 +159,7 @@ class SlicingWidget(dockarea.DockArea):
         self.roi.show()
         self.roi.center()
         self.roi.center()
-        self.controller.slicing_roi_controller.setEnabled(True)
+        self.controller.roi_controller.setEnabled(True)
 
         if self.child is not None:
             self.child.controller.setEnabled(True)
@@ -172,40 +172,11 @@ class SlicingWidget(dockarea.DockArea):
         self.image_view.clear()
         self.image_view.setEnabled(False)
         self.roi.hide()
-        self.controller.slicing_roi_controller.setEnabled(False)
+        self.controller.roi_controller.setEnabled(False)
         
         if self.child is not None:
             self.child.controller.enable_chkbx.setChecked(False)
             self.child.controller.setEnabled(False)
-        
-# ----------------------------------------------------------------------------------
-
-class SlicingController(QtGui.QWidget):
-
-    def __init__(self, slicing_widget, data_array) -> None:
-        super(SlicingController, self).__init__(slicing_widget)
-
-        self.slicing_widget = slicing_widget
-
-        self.slicing_roi_controller = SlicingROIController(data_array, self)
-        self.enable_chkbx = QtGui.QCheckBox("Enable")
-        self.center_btn = QtGui.QPushButton("Center")
-        self.export_btn = QtGui.QPushButton("Export")
-
-        self.layout = QtGui.QGridLayout()
-        self.setLayout(self.layout)
-
-        self.layout.addWidget(self.slicing_roi_controller, 0, 0, 1, 3)
-        self.layout.addWidget(self.enable_chkbx, 1, 0)
-        self.layout.addWidget(self.center_btn, 1, 1)
-        self.layout.addWidget(self.export_btn, 1, 2)
-
-        self.layout.setColumnStretch(0, 1)
-        self.layout.setColumnStretch(1, 1)
-        self.layout.setColumnStretch(2, 1)
-
-        self.layout.setRowStretch(0, 6)
-        self.layout.setRowStretch(1, 1)
 
 # ----------------------------------------------------------------------------------
 
@@ -232,8 +203,6 @@ class SlicingROI(pg.LineSegmentROI):
             )
             x_coords, y_coords = coords.astype(int)
 
-            self.coords = x_coords, y_coords
-
             for i in range(len(x_coords)):
                 if x_coords[i] < 0:
                     x_coords[i] = 0
@@ -244,6 +213,8 @@ class SlicingROI(pg.LineSegmentROI):
                     y_coords[i] = 0
                 if y_coords[i] >= p_data_array.values.shape[1]:
                     y_coords[i] = p_data_array.values.shape[1] - 1
+
+            self.coords = x_coords, y_coords
 
             c_data_array = xr.concat(
                 [p_data_array[x, y] for x, y in zip(x_coords, y_coords)],
@@ -262,6 +233,8 @@ class SlicingROI(pg.LineSegmentROI):
                 c_data_array_slice
             )  
 
+            self.slicing_widget.controller.roi_controller.update_controller()
+
     # ------------------------------------------------------------------------------
 
     def center(self):
@@ -273,6 +246,41 @@ class SlicingROI(pg.LineSegmentROI):
 
         self.movePoint(self.getHandles()[0], (x_1, y_1))
         self.movePoint(self.getHandles()[1], (x_2, y_2))
+
+    # ------------------------------------------------------------------------------
+
+    def move(self, x_1, x_2, y_1, y_2):
+        self.movePoint(self.getHandles()[0], (x_1, y_1))
+        self.movePoint(self.getHandles()[1], (x_2, y_2))
+
+# ----------------------------------------------------------------------------------
+
+class SlicingController(QtGui.QWidget):
+
+    def __init__(self, slicing_widget, data_array) -> None:
+        super(SlicingController, self).__init__(slicing_widget)
+
+        self.slicing_widget = slicing_widget
+
+        self.roi_controller = SlicingROIController(data_array, self)
+        self.enable_chkbx = QtGui.QCheckBox("Enable")
+        self.center_btn = QtGui.QPushButton("Center")
+        self.export_btn = QtGui.QPushButton("Export")
+
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(self.roi_controller, 0, 0, 1, 3)
+        self.layout.addWidget(self.enable_chkbx, 1, 0)
+        self.layout.addWidget(self.center_btn, 1, 1)
+        self.layout.addWidget(self.export_btn, 1, 2)
+
+        self.layout.setColumnStretch(0, 1)
+        self.layout.setColumnStretch(1, 1)
+        self.layout.setColumnStretch(2, 1)
+
+        self.layout.setRowStretch(0, 6)
+        self.layout.setRowStretch(1, 1)
 
 # ----------------------------------------------------------------------------------
 
@@ -297,6 +305,8 @@ class SlicingROIController(QtGui.QWidget):
         self.main_controller.updated.connect(self.set_dimension_order)
         self.roi.sigRegionChanged.connect(self.update_controller)
 
+        self.updating = None
+
         self.set_dimension_order()
 
     # ------------------------------------------------------------------------------
@@ -313,18 +323,21 @@ class SlicingROIController(QtGui.QWidget):
 
     def update_controller(self):
         try:
+            if self.updating == "ROI":
+                return  
+
+            self.updating = "Controller"
+
             self.data_array = self.main_controller.data_array
             slice_degree = self.data_array.ndim - self.roi.parent_imv.data_array.ndim
 
             if slice_degree == 0:
                 self.dim_ctrls[0].set_dimension(
                     0, 
-                    coords=self.data_array.coords[self.data_array.dims[0]].values,
                     ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
                 )
                 self.dim_ctrls[1].set_dimension(
                     1, 
-                    coords=self.data_array.coords[self.data_array.dims[1]].values,
                     ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
                 )
                 for i in range(2, self.data_array.ndim):
@@ -347,15 +360,14 @@ class SlicingROIController(QtGui.QWidget):
                 )
                 self.dim_ctrls[2].set_dimension(
                     2, 
-                    coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in y_indicies],
                     ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
                 )
                 for i in range(3, self.data_array.ndim):
                     self.dim_ctrls[i].setEnabled(False)
 
             elif slice_degree == 2:
-                x1_indicies = self.roi.parent_roi.parent_roi.coords[0]
-                x2_indicies = self.roi.parent_roi.parent_roi.coords[1]
+                x1_indicies = [self.roi.parent_roi.parent_roi.coords[0][i] for i in self.roi.parent_roi.coords[0]]
+                x2_indicies = [self.roi.parent_roi.parent_roi.coords[1][i] for i in self.roi.parent_roi.coords[0]]
                 x3_indicies = self.roi.parent_roi.coords[1]
                 y_indicies = self.roi.coords[1]
 
@@ -376,12 +388,71 @@ class SlicingROIController(QtGui.QWidget):
                 )
                 self.dim_ctrls[3].set_dimension(
                     3, 
-                    coords=[self.data_array.coords[self.data_array.dims[3]].values[i] for i in y_indicies],
                     ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
                 )
+
+            self.updating = None
         except:
             ...
 
+    # ------------------------------------------------------------------------------
+
+    def update_roi(self):
+        try:
+
+            if self.updating == "Controller":
+                return  
+
+            def _is_monotonic(values: list) -> bool:
+                """
+                Checks list for monoticity.
+                """
+                # Differentiated list
+                dx = np.diff(values)
+
+                return np.all(dx <= 0) or np.all(dx >= 0)
+
+            self.data_array = self.main_controller.data_array
+            slice_degree = self.data_array.ndim - self.roi.parent_imv.data_array.ndim
+
+            p_data_array = self.roi.parent_imv.data_array
+            
+            x_1_index = self.dim_ctrls[0].endpoint_1_cbx.currentIndex()
+            x_2_index = self.dim_ctrls[0].endpoint_2_cbx.currentIndex()  
+            
+            if slice_degree == 0:
+                y_1_index = self.dim_ctrls[1].endpoint_1_cbx.currentIndex()
+                y_2_index = self.dim_ctrls[1].endpoint_2_cbx.currentIndex()
+                for i in range(2, self.data_array.ndim):
+                    self.dim_ctrls[i].setEnabled(False)
+            elif slice_degree == 1:
+                y_1_index = self.dim_ctrls[2].endpoint_1_cbx.currentIndex()
+                y_2_index = self.dim_ctrls[2].endpoint_2_cbx.currentIndex()
+                for i in range(3, self.data_array.ndim):
+                    self.dim_ctrls[i].setEnabled(False)
+            elif slice_degree == 2:
+                y_1_index = self.dim_ctrls[3].endpoint_1_cbx.currentIndex()
+                y_2_index = self.dim_ctrls[3].endpoint_2_cbx.currentIndex()
+
+            if _is_monotonic(p_data_array.coords[p_data_array.dims[0]].values):
+                x_1 = p_data_array.coords[p_data_array.dims[0]].values[x_1_index]
+                x_2 = p_data_array.coords[p_data_array.dims[0]].values[x_2_index]
+            else:
+                x_1 = x_1_index
+                x_2 = x_2_index
+
+            if _is_monotonic(p_data_array.coords[p_data_array.dims[1]].values):
+                y_1 = p_data_array.coords[p_data_array.dims[1]].values[y_1_index]
+                y_2 = p_data_array.coords[p_data_array.dims[1]].values[y_2_index]
+            else:
+                y_1 = y_1_index
+                y_2 = y_2_index
+
+            self.roi.move(x_1, x_2, y_1, y_2)
+
+            self.updating = None
+        except:
+            ...
 # ----------------------------------------------------------------------------------
 
 class SlicingROIDimensionController(QtGui.QWidget):
@@ -402,6 +473,9 @@ class SlicingROIDimensionController(QtGui.QWidget):
         self.layout.addWidget(self.dim_lbl, 0, 0)
         self.layout.addWidget(self.endpoint_1_cbx, 0, 1, 1, 2)
         self.layout.addWidget(self.endpoint_2_cbx, 0, 3, 1, 2)
+
+        self.endpoint_1_cbx.currentIndexChanged.connect(parent.update_roi)
+        self.endpoint_2_cbx.currentIndexChanged.connect(parent.update_roi)
 
     # ------------------------------------------------------------------------------
 
@@ -425,6 +499,6 @@ class SlicingROIDimensionController(QtGui.QWidget):
             self.endpoint_2_cbx.setCurrentIndex(len(dim_coords) - 1)
         else:
             self.endpoint_1_cbx.setCurrentIndex(ends[0])
-            self.endpoint_2_cbx.setCurrentIndex(ends[1])
+            self.endpoint_2_cbx.setCurrentIndex(ends[-1])
 
 # ----------------------------------------------------------------------------------
