@@ -50,12 +50,14 @@ pip install image-analysis-util
 
 ## Screenshots
 
-<img src="https://github.com/henryjsmith12/image-analysis-util/blob/main/examples/screenshots/image_tool_4D.png" width="500"/>
+<img src="https://github.com/henryjsmith12/image-analysis-util/blob/main/examples/screenshots/v0_1_2_image_tool_3d.png" width="500"/>
+
+<img src="https://github.com/henryjsmith12/image-analysis-util/blob/main/examples/screenshots/v0_1_2_image_tool_4d.png" width="500"/>
 
 ## Roadmap
 
-* [ ] SlicingROI enable/disable
-* [ ] Manual SlicingROI controls
+* [X] SlicingROI enable/disable
+* [X] Manual SlicingROI controls
 * [ ] Slice "Export" button
 
 ## License
