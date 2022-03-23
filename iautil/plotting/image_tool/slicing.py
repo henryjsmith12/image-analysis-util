@@ -17,7 +17,7 @@ from iautil.plotting.image_tool.controller import DimensionController
 
 class SlicingTab(QtGui.QWidget):
     """
-    Houses SlicingWidgets
+    Houses SlicingWidget objects.
     """
 
     def __init__(self, data_array: xr.DataArray, parent=None) -> None:
@@ -26,6 +26,7 @@ class SlicingTab(QtGui.QWidget):
         self.parent = parent
         self.data_array = data_array
 
+        # List of SlicingWidget objects housed in tab
         self.slicing_widgets = [
             SlicingWidget(i, self, data_array) for i in range(data_array.ndim, 1, -1)
         ]
@@ -33,6 +34,8 @@ class SlicingTab(QtGui.QWidget):
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
 
+        # Connects each SlicingWidget to a parent and child SlicingWidget
+        # Then adds SlicingWidget to layout
         for i in range(len(self.slicing_widgets)):
             if i == 0:
                 self.slicing_widgets[i].set_parent(self.parent.data_array_image_view)
@@ -48,6 +51,7 @@ class SlicingTab(QtGui.QWidget):
 
             self.slicing_widgets[i].roi.child_imv = self.slicing_widgets[i].image_view
 
+            # Initially disables SlicingWidget
             self.slicing_widgets[i].disable()
 
             self.layout.addWidget(self.slicing_widgets[i])
@@ -56,22 +60,26 @@ class SlicingTab(QtGui.QWidget):
 # ----------------------------------------------------------------------------------
 
 class SlicingWidget(dockarea.DockArea):
+    """
+    A widget that visualizes a slice of the overall DataArray.
+    """
 
     def __init__(self, dim: int, tab, data_array) -> None:
         super(SlicingWidget, self).__init__()
         
+        # Parent tab and DataArrayController from overall ImageTool
         self.tab = tab
-
         self.main_controller = tab.parent.data_array_controller
         
+        # Set to non-None values in SlicingTab constructor
         self.parent, self.child = None, None
         self.data_array = data_array
 
-        # Slicing ROI
+        # Creates SlicingROI
         self.roi = SlicingROI()
         self.roi.slicing_widget = self
 
-        # Subwidgets
+        # ImageView and SlicingController creation based on dimension of DataArray
         if dim == 2:
             self.image_view = DataArrayPlot()
             self.controller = SlicingController(self, data_array)
@@ -125,6 +133,9 @@ class SlicingWidget(dockarea.DockArea):
     # ------------------------------------------------------------------------------
 
     def set_parent(self, parent):
+        """
+        Sets parent SlicingWidget and connects the ROI
+        """
         self.parent = parent
 
         if isinstance(parent, DataArrayImageView):
@@ -138,6 +149,9 @@ class SlicingWidget(dockarea.DockArea):
     # ------------------------------------------------------------------------------
 
     def set_child(self, child):
+        """
+        Sets child SlicingWidget and connects the ROI
+        """
         self.child = child
 
         self.roi.child_roi = child.roi
@@ -146,6 +160,9 @@ class SlicingWidget(dockarea.DockArea):
     # ------------------------------------------------------------------------------
 
     def toggle_enabled(self):
+        """
+        Calls function to enable/disable SlicingWidget
+        """
         if self.controller.enable_chkbx.isChecked():
             self.enable()
         else:
@@ -154,6 +171,9 @@ class SlicingWidget(dockarea.DockArea):
     # ------------------------------------------------------------------------------
 
     def enable(self):
+        """
+        Enable SlicingWidget and enables "Enable" checkbox for child widget
+        """
         self.enabled = True
 
         self.image_view.setEnabled(True)
@@ -168,6 +188,9 @@ class SlicingWidget(dockarea.DockArea):
     # ------------------------------------------------------------------------------
 
     def disable(self):
+        """
+        Disables SlicingWidget and child widget
+        """
         self.enabled = False
 
         self.image_view.clear()
@@ -182,6 +205,9 @@ class SlicingWidget(dockarea.DockArea):
 # ----------------------------------------------------------------------------------
 
 class SlicingROI(pg.LineSegmentROI):
+    """
+    Custom LineSegmentROI to be used within a SlicingWidget
+    """
     
     def __init__(self, position=(0,0), parent=None) -> None:
         super(SlicingROI, self).__init__(position)
@@ -193,10 +219,15 @@ class SlicingROI(pg.LineSegmentROI):
     # ------------------------------------------------------------------------------
 
     def slice_data_array(self):
+        """
+        Creates new DataArray from slice coordinates and displays in ImageView
+        """
         if self.slicing_widget.enabled:
+            # DataArray and slice from parent ImageView
             p_data_array = self.parent_imv.data_array
             p_data_array_slice = self.parent_imv.data_array_slice
 
+            # Slicing coords
             data, coords = self.getArrayRegion(
                 data=p_data_array_slice,
                 img=self.parent_imv.getImageItem(),
@@ -204,6 +235,7 @@ class SlicingROI(pg.LineSegmentROI):
             )
             x_coords, y_coords = coords.astype(int)
 
+            # For coordinate indicies outside those of image
             for i in range(len(x_coords)):
                 if x_coords[i] < 0:
                     x_coords[i] = 0
@@ -214,15 +246,17 @@ class SlicingROI(pg.LineSegmentROI):
                     y_coords[i] = 0
                 if y_coords[i] >= p_data_array.values.shape[1]:
                     y_coords[i] = p_data_array.values.shape[1] - 1
-
             self.coords = x_coords, y_coords
 
+            # Creates child data array from coords
             c_data_array = xr.concat(
                 [p_data_array[x, y] for x, y in zip(x_coords, y_coords)],
                 f"{p_data_array.dims[0]}, {p_data_array.dims[1]}"
             )
 
+            # Takes slice
             if c_data_array.ndim == 3:
+                # 3D slice based off slider value
                 c_data_array_slice = c_data_array[
                     :, :, self.slicing_widget.slider.value_slider.value()
                 ]
@@ -234,11 +268,15 @@ class SlicingROI(pg.LineSegmentROI):
                 c_data_array_slice
             )  
 
+            # Updates ROIController
             self.slicing_widget.controller.roi_controller.update_controller()
 
     # ------------------------------------------------------------------------------
 
     def center(self):
+        """
+        Centers ROI.
+        """
         p_data_array = self.parent_imv.data_array
         x_1 = p_data_array.coords[p_data_array.dims[0]].values[0]
         x_2 = p_data_array.coords[p_data_array.dims[0]].values[-1]
@@ -251,12 +289,18 @@ class SlicingROI(pg.LineSegmentROI):
     # ------------------------------------------------------------------------------
 
     def move(self, x_1, x_2, y_1, y_2):
+        """
+        Moves ROI to specific location.
+        """
         self.movePoint(self.getHandles()[0], (x_1, y_1))
         self.movePoint(self.getHandles()[1], (x_2, y_2))
 
 # ----------------------------------------------------------------------------------
 
 class SlicingController(QtGui.QWidget):
+    """
+    Houses an ROIController, and various options for SlicingWidget
+    """
 
     def __init__(self, slicing_widget, data_array) -> None:
         super(SlicingController, self).__init__(slicing_widget)
@@ -271,21 +315,23 @@ class SlicingController(QtGui.QWidget):
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
 
+        # Add widgets to layout
         self.layout.addWidget(self.roi_controller, 0, 0, 1, 3)
         self.layout.addWidget(self.enable_chkbx, 1, 0)
         self.layout.addWidget(self.center_btn, 1, 1)
         #self.layout.addWidget(self.export_btn, 1, 2)
-
         self.layout.setColumnStretch(0, 1)
         self.layout.setColumnStretch(1, 1)
         self.layout.setColumnStretch(2, 1)
-
         self.layout.setRowStretch(0, 6)
         self.layout.setRowStretch(1, 1)
 
 # ----------------------------------------------------------------------------------
 
 class SlicingROIController(QtGui.QWidget):
+    """
+    Houses coordinate bounds for each dimension of ROI
+    """
 
     def __init__(self, data_array, parent=None) -> None:
         super(SlicingROIController, self).__init__()
@@ -313,6 +359,9 @@ class SlicingROIController(QtGui.QWidget):
     # ------------------------------------------------------------------------------
 
     def set_dimension_order(self):
+        """ 
+        Sets new dimension order for slice
+        """
         self.data_array = self.main_controller.data_array
         
         for i in range(self.data_array.ndim):
@@ -323,6 +372,9 @@ class SlicingROIController(QtGui.QWidget):
     # ------------------------------------------------------------------------------
 
     def update_controller(self):
+        """
+        Sets dimension bounds in controller
+        """
         try:
             if self.updating == "ROI":
                 return  
@@ -399,8 +451,10 @@ class SlicingROIController(QtGui.QWidget):
     # ------------------------------------------------------------------------------
 
     def update_roi(self, dim: int):
+        """
+        Sets ROI location based on changes in the SlicingROIDimensionControllers
+        """
         try:
-
             if self.updating == "Controller":
                 return  
 
@@ -465,6 +519,7 @@ class SlicingROIController(QtGui.QWidget):
             self.updating = None
         except:
             ...
+
 # ----------------------------------------------------------------------------------
 
 class SlicingROIDimensionController(QtGui.QWidget):

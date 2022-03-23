@@ -134,6 +134,9 @@ class DataArrayController(QtGui.QWidget):
 # ----------------------------------------------------------------------------------
 
 class DimensionController(QtGui.QGroupBox):
+    """
+    Controls value of a particular dimension. Includes label, slider, and combobox.
+    """
 
     updated = QtCore.pyqtSignal()
         
