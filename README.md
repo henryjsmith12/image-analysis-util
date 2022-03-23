@@ -56,9 +56,9 @@ pip install image-analysis-util
 
 ## Roadmap
 
-* [X] SlicingROI enable/disable
-* [X] Manual SlicingROI controls
-* [ ] Slice "Export" button
+* [ ] File Exportation - The ideal goal will be to have exporting options for xarray DataArray objects, .iau files, and matplotlib plots.
+* [ ] Performance improvements for slicing
+* [ ] Extensive testing
 
 ## License
 
