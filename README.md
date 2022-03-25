@@ -6,7 +6,7 @@ Scientific image exploration software for 2D, 3D, and 4D datasets. A continuatio
 
 ## About
 
-The image-analysis-util repository focuses on providing tools for users to explore and analyze their datasets.
+The image-analysis-util repository focuses on providing tools for users to explore and analyze their datasets. In constrast to Image_Analysis, the ultimate goal of image-analysis-util is to provide a generalized set of analysis features.
 
 ### Built With
 
@@ -32,7 +32,7 @@ pip install image-analysis-util
 
 #### Conda Installation
 
-1. Clone the repositiory
+1. Clone the repositiory.
 
    ```
    git clone https://github.com/henryjsmith12/image-analysis-util.git
@@ -42,7 +42,7 @@ pip install image-analysis-util
    ```
    conda env create -f environment.yml
    ```
-3. Activate the virtual environment
+3. Activate the virtual environment.
 
    ```
    conda activate ia-util-venv
@@ -56,9 +56,11 @@ pip install image-analysis-util
 
 ## Roadmap
 
+* [ ] Tutorial files for file creation/ImageTool
 * [ ] File Exportation - The ideal goal will be to have exporting options for xarray DataArray objects, .iau files, and matplotlib plots.
 * [ ] Performance improvements for slicing
 * [ ] Extensive testing
+* [ ] Pixel averaging
 
 ## License
 
