@@ -56,11 +56,11 @@ pip install image-analysis-util
 
 ## Roadmap
 
-* [ ] Tutorial files for file creation/ImageTool
+* [X] Tutorial files for file creation/ImageTool
 * [ ] File Exportation - The ideal goal will be to have exporting options for xarray DataArray objects, .iau files, and matplotlib plots.
 * [ ] Performance improvements for slicing
 * [ ] Extensive testing
-* [ ] Pixel averaging
+* [ ] Pixel averaging (ROIs/Binning)
 
 ## License
 
