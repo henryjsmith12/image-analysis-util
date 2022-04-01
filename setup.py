@@ -12,7 +12,7 @@ long_description = (this_dir / "README.md").read_text()
 
 setup( 
     name="image-analysis-util",
-    version="0.1.2",
+    version="0.1.3",
     description="Scientific image exploration software for multidimensional datasets.",
     long_description=long_description,
     long_description_content_type="text/markdown",
