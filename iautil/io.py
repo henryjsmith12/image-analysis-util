@@ -231,3 +231,35 @@ def _stitch(
     return data, coords
 
 # ----------------------------------------------------------------------------------
+
+def create_csv(data, coords, labels, csv_path):
+    rows = []
+    headers = labels + ["Value"]
+    rows.append(headers)
+    if data.ndim == 2:
+        for x in range(data.shape[0]):
+            for y in range(data.shape[1]):
+                row = []
+                for i in range(len(coords)):
+                    if i != len(coords) - 1:
+                        row.append(coords[i][x])
+                    else:
+                        row.append(coords[i][y])
+                row.append(data[x][y])
+                rows.append(row)
+    elif data.ndim == 1:
+        for x in range(data.shape[0]):
+            row = []
+            for i in range(len(coords)):
+                row.append(coords[i][x])
+            row.append(data[x])
+            rows.append(row)
+
+    np.savetxt(
+        csv_path,
+        rows,
+        delimiter=",",
+        fmt ='% s'
+    )
+
+# ----------------------------------------------------------------------------------
