@@ -7,9 +7,10 @@ Displays views from arbitrary slices of a DataArray
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import dockarea
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 import xarray as xr
 
+from iautil import io
 from iautil.utilities.ui import DataArrayImageView, DataArrayPlot
 from iautil.plotting.image_tool.controller import DimensionController
 
@@ -83,9 +84,11 @@ class SlicingWidget(dockarea.DockArea):
         if dim == 2:
             self.image_view = DataArrayPlot()
             self.controller = SlicingController(self, data_array)
+            self.controller.layout.addWidget(self.controller.export_btn, 1, 2)
         elif dim == 3:
             self.image_view = DataArrayImageView()
             self.controller = SlicingController(self, data_array)
+            self.controller.layout.addWidget(self.controller.export_btn, 1, 2)
         elif dim == 4:
             self.image_view = DataArrayImageView()
             self.controller = SlicingController(self, data_array)
@@ -121,6 +124,7 @@ class SlicingWidget(dockarea.DockArea):
 
         # Connections
         self.controller.center_btn.clicked.connect(self.roi.center)
+        self.controller.export_btn.clicked.connect(self.export)
         self.controller.enable_chkbx.stateChanged.connect(self.toggle_enabled)
         if dim == 4:
             self.main_controller.updated.connect(
@@ -201,6 +205,60 @@ class SlicingWidget(dockarea.DockArea):
         if self.child is not None:
             self.child.controller.enable_chkbx.setChecked(False)
             self.child.controller.setEnabled(False)
+
+    # ------------------------------------------------------------------------------
+
+    def export(self):
+        data = self.image_view.data_array.values
+        coords = []
+        labels = []
+
+        for dim_ctrl in self.controller.roi_controller.dim_ctrls:
+            coords.append(dim_ctrl.used_coords)
+            labels.append(dim_ctrl.dim_lbl.text())
+
+        export_dialog = SlicingExportDialog()
+        export_dialog.exec_()
+
+        if export_dialog is not None:
+            if export_dialog.format == ".csv":
+                io.create_csv(data, coords, labels, export_dialog.path)
+
+# ----------------------------------------------------------------------------------
+
+class SlicingExportDialog(QtGui.QDialog):
+
+    def __init__ (self):
+        super().__init__()
+
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+
+        self.format_lbl = QtGui.QLabel("Format:")
+        self.format_cbx = QtGui.QComboBox()
+        self.format_cbx.addItems([".csv"])
+        self.dialog_btnbox = QtGui.QDialogButtonBox()
+        self.dialog_btnbox.addButton("OK", QtGui.QDialogButtonBox.AcceptRole)
+
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(self.format_lbl, 0, 0)
+        self.layout.addWidget(self.format_cbx, 0, 1)
+        self.layout.addWidget(self.dialog_btnbox, 1, 1)
+
+        self.dialog_btnbox.accepted.connect(self.accept)
+
+    # --------------------------------------------------------------------------
+
+    def accept(self):
+
+        """
+        Sets class variables to values in dialog and closes the dialog window.
+        """
+
+        self.format = self.format_cbx.currentText()
+        self.path = QtGui.QFileDialog.getSaveFileName(self, "", "", f"(*{self.format})")[0]
+        self.close()
 
 # ----------------------------------------------------------------------------------
 
@@ -387,11 +445,11 @@ class SlicingROIController(QtGui.QWidget):
             if slice_degree == 0:
                 self.dim_ctrls[0].set_dimension(
                     0, 
-                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
+                    indices=self.roi.coords[0]
                 )
                 self.dim_ctrls[1].set_dimension(
                     1, 
-                    ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
+                    indices=self.roi.coords[1]
                 )
                 for i in range(2, self.data_array.ndim):
                     self.dim_ctrls[i].setEnabled(False)
@@ -404,20 +462,20 @@ class SlicingROIController(QtGui.QWidget):
                 self.dim_ctrls[0].set_dimension(
                     0, 
                     coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies],
-                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
+                    indices=self.roi.coords[0]
                 )
                 self.dim_ctrls[1].set_dimension(
                     1, 
                     coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies],
-                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
+                    indices=self.roi.coords[0]
                 )
                 self.dim_ctrls[2].set_dimension(
                     2, 
-                    ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
+                    indices=self.roi.coords[1]
                 )
                 for i in range(3, self.data_array.ndim):
                     self.dim_ctrls[i].setEnabled(False)
-
+                
             elif slice_degree == 2:
                 x1_indicies = [self.roi.parent_roi.parent_roi.coords[0][i] for i in self.roi.parent_roi.coords[0]]
                 x2_indicies = [self.roi.parent_roi.parent_roi.coords[1][i] for i in self.roi.parent_roi.coords[0]]
@@ -427,21 +485,21 @@ class SlicingROIController(QtGui.QWidget):
                 self.dim_ctrls[0].set_dimension(
                     0, 
                     coords=[self.data_array.coords[self.data_array.dims[0]].values[i] for i in x1_indicies],
-                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
+                    indices=self.roi.coords[0]
                 )
                 self.dim_ctrls[1].set_dimension(
                     1, 
                     coords=[self.data_array.coords[self.data_array.dims[1]].values[i] for i in x2_indicies],
-                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
+                    indices=self.roi.coords[0]
                 )
                 self.dim_ctrls[2].set_dimension(
                     2, 
                     coords=[self.data_array.coords[self.data_array.dims[2]].values[i] for i in x3_indicies],
-                    ends=(self.roi.coords[0][0], self.roi.coords[0][-1])
+                    indices=self.roi.coords[0]
                 )
                 self.dim_ctrls[3].set_dimension(
                     3, 
-                    ends=(self.roi.coords[1][0], self.roi.coords[1][-1])
+                    indices=self.roi.coords[1]
                 )
 
             self.updating = None
@@ -531,6 +589,7 @@ class SlicingROIDimensionController(QtGui.QWidget):
         self.main_controller = self.parent.main_controller
 
         self.dim = 0
+        self.used_coords = []
 
         self.dim_lbl = QtGui.QLabel()
         self.endpoint_1_cbx = QtGui.QComboBox()
@@ -552,7 +611,7 @@ class SlicingROIDimensionController(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
-    def set_dimension(self, dim, coords=None, ends=None):
+    def set_dimension(self, dim, coords=None, indices=None):
         self.dim = dim
 
         self.data_array = self.main_controller.data_array
@@ -569,10 +628,13 @@ class SlicingROIDimensionController(QtGui.QWidget):
         self.endpoint_2_cbx.clear()
         self.endpoint_1_cbx.addItems(dim_coords)
         self.endpoint_2_cbx.addItems(dim_coords)
-        if ends is None:
+        if indices is None:
             self.endpoint_2_cbx.setCurrentIndex(len(dim_coords) - 1)
+            self.used_coords = dim_coords
         else:
-            self.endpoint_1_cbx.setCurrentIndex(ends[0])
-            self.endpoint_2_cbx.setCurrentIndex(ends[-1])
+            self.endpoint_1_cbx.setCurrentIndex(indices[0])
+            self.endpoint_2_cbx.setCurrentIndex(indices[-1])
+
+            self.used_coords = [dim_coords[i] for i in indices]
 
 # ----------------------------------------------------------------------------------
