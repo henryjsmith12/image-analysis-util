@@ -263,3 +263,26 @@ def create_csv(data, coords, labels, csv_path):
     )
 
 # ----------------------------------------------------------------------------------
+
+'''def create_netcdf(data, coords, labels, nc_path):
+    
+    if data.ndim == 3:
+        adjusted_labels = [",".join(labels[:2]), labels[2], labels[3]]
+    elif data.ndim == 2:
+        adjusted_labels = [",".join(labels[:-1]), labels[-1]]
+    else:
+        adjusted_labels = [",".join(labels)]
+
+    adjusted_coords = {}
+    for l, c in zip(labels, coords):
+        adjusted_coords[l] = c
+
+    data_array = xr.DataArray(
+        data,
+        dims=adjusted_labels,
+        coords=adjusted_coords
+    )
+
+    print(data_array)'''
+
+# ----------------------------------------------------------------------------------

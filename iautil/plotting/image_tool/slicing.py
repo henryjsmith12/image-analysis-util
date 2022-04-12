@@ -223,6 +223,8 @@ class SlicingWidget(dockarea.DockArea):
         if export_dialog is not None:
             if export_dialog.format == ".csv":
                 io.create_csv(data, coords, labels, export_dialog.path)
+            if export_dialog.format == ".nc":
+                io.create_netcdf(data, coords, labels, export_dialog.path)
 
 # ----------------------------------------------------------------------------------
 
@@ -235,7 +237,7 @@ class SlicingExportDialog(QtGui.QDialog):
 
         self.format_lbl = QtGui.QLabel("Format:")
         self.format_cbx = QtGui.QComboBox()
-        self.format_cbx.addItems([".csv"])
+        self.format_cbx.addItems([".csv", ".nc"])
         self.dialog_btnbox = QtGui.QDialogButtonBox()
         self.dialog_btnbox.addButton("OK", QtGui.QDialogButtonBox.AcceptRole)
 
