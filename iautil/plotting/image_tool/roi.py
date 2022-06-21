@@ -94,11 +94,6 @@ class ROIController(QtGui.QWidget):
 
     def __init__(self, roi_widget, data_array) -> None:
             super(ROIController, self).__init__(roi_widget)
-  
-# ----------------------------------------------------------------------------------
-
-class ROIDimensionController():
-    ...
 
 # ----------------------------------------------------------------------------------
 
