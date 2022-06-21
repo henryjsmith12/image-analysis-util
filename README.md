@@ -37,6 +37,7 @@ pip install image-analysis-util
    ```
    git clone https://github.com/henryjsmith12/image-analysis-util.git
    ```
+   
 2. Create an Anaconda virtual environment using `environment.yml`. The environment name can be altered in that file. By default, the virtual environment is named `ia-util-venv`.
 
    ```
