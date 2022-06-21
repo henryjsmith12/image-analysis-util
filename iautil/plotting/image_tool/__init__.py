@@ -82,12 +82,14 @@ class ImageToolWidget(QtGui.QWidget):
         """
 
         from iautil.plotting.image_tool.controller import DataArrayController
+        from iautil.plotting.image_tool.roi import ROITab
         from iautil.plotting.image_tool.slicing import SlicingTab
         from iautil.utilities.ui import DataArrayImageView
         
         self.data_array_image_view = DataArrayImageView()
         self.data_array_controller = DataArrayController(self.data_array, self)
         self.slicing_tab = SlicingTab(self.data_array, self)
+        self.roi_tab = ROITab(self.data_array, self)
         
     # ------------------------------------------------------------------------------
     
@@ -121,12 +123,18 @@ class ImageToolWidget(QtGui.QWidget):
             widget=self.slicing_tab
         )
 
+        self.roi_tab_dock = dockarea.Dock(
+            name="ROI",
+            size=(200, 400),
+            widget=self.roi_tab
+        )
+
         self.dock_area.addDock(self.data_array_image_view_dock)
-        self.dock_area.addDock(self.slicing_tab_dock, "right", 
+        self.dock_area.addDock(self.roi_tab_dock, "right", 
             self.data_array_image_view_dock)
         self.dock_area.addDock(self.controller_widget_dock, "bottom", 
             self.data_array_image_view_dock)
-        #self.dock_area.addDock(self.info_widget_dock, "below", 
-            #self.controller_widget_dock)
+        self.dock_area.addDock(self.slicing_tab_dock, "above", 
+            self.roi_tab_dock)
 
 # ----------------------------------------------------------------------------------
