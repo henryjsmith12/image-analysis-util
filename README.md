@@ -6,7 +6,7 @@ Scientific image exploration software for 2D, 3D, and 4D datasets. A continuatio
 
 ## About
 
-The image-analysis-util repository focuses on providing tools for users to explore and analyze their datasets. In constrast to Image_Analysis, the ultimate goal of image-analysis-util is to provide a generalized set of analysis features.
+The image-analysis-util repository focuses on providing tools for users to explore and analyze their datasets. The ultimate goal of image-analysis-util is to provide a generalized set of analysis features.
 
 ### Built With
 
